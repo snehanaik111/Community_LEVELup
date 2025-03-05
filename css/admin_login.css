@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --background-color: #f4f6ff;
+    --login-box-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --primary-color: #4c51bf;
+    --secondary-color: #231ca8;
+    --border-color: #d7d5da;
+}
+
+body {
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 100%;
+}
+
+/* Login Box */
+.login-box {
+    background-color: var(--login-box-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 1px 1px 15px var(--shadow-color);
+    transition: all 0.3s ease-in-out;
+}
+
+.login-box:hover {
+    transform: scale(1.02);
+}
+
+/* Headings */
+h2 {
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Form Inputs */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.btn-dark {
+    background-color: var(--secondary-color);
+}
+
+.btn-dark:hover {
+    background-color: #1b149c;
+    transform: scale(1.05);
+}
+
+/* Error Message */
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}

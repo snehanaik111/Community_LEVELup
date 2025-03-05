@@ -1,0 +1,718 @@
+body { 
+    font-family: Arial, sans-serif; 
+    background-color: #f4f6f9; 
+}
+
+/* Sidebar with gradient */
+.sidebar { 
+    width: 250px; 
+    background: linear-gradient(135deg, #00843D, #00B894); /* Gradient from green to red */
+    color: white; 
+    height: 100vh; 
+    padding: 20px; 
+    position: fixed; 
+    text-align: left;
+}
+
+.sidebar h2 { 
+    text-align: center; 
+}
+
+/* Sidebar links */
+.sidebar a { 
+    color: white; 
+    text-decoration: none; 
+    display: block; 
+    padding: 10px; 
+    margin-top: 10px; 
+    transition: background 0.3s ease-in-out;
+}
+
+.sidebar a:hover { 
+    background: rgba(255, 255, 255, 0.2); 
+    border-radius: 5px; 
+}
+
+/* Logo Styling */
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-container img {
+    width: 100px; /* Adjust size as needed */
+}
+
+/* Main Content */
+.main-content { 
+    margin-left: 270px; 
+    padding: 20px; 
+}
+
+/* Card design */
+.card { 
+    border-radius: 10px; 
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); 
+}
+
+/* Stat cards with gradient backgrounds */
+.stat-card { 
+    padding: 20px; 
+    color: white; 
+    border-radius: 10px; 
+}
+
+/* Gradient backgrounds for different stat cards */
+.stat-card:nth-child(1) { background: linear-gradient(135deg, #00843D, #00B894); } /* Green gradient */
+.stat-card:nth-child(2) { background: linear-gradient(135deg, #FF5E62, #FC466B); } /* Red to pink */
+.stat-card:nth-child(3) { background: linear-gradient(135deg, #FC466B, #FFBB33); } /* Pink to orange */
+.stat-card:nth-child(4) { background: linear-gradient(135deg, #FFBB33, #F4D03F); } /* Orange to yellow */
+
+/* Logout button */
+.logout-btn { 
+    position: absolute; 
+    bottom: 20px; 
+    left: 20px; 
+}
+
+/* Table Styling */
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+}
+
+th, td { 
+    border: 1px solid black; 
+    padding: 10px; 
+    text-align: left; 
+}
+
+th { 
+    background-color: #f4f4f4; 
+}
+
+/* Table Heading */
+.table-heading {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.table-heading {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-table th, .user-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.user-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.user-table img {
+    border-radius: 50%;
+}
+
+.btn-view {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn-download {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Profile Image */
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+/* Sort Button */
+.sort-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Log Button */
+.log-btn {
+    padding: 5px 10px;
+    background: linear-gradient(135deg, #FF5E62, #FC466B); /* Red gradient */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s ease-in-out;
+}
+
+.log-btn:hover {
+    background: linear-gradient(135deg, #E04850, #D43F48);
+}
+
+/* Log Details */
+.log-details ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.log-details li {
+    background-color: #f9f9f9;
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.log-details {
+    margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .user-table th, .user-table td {
+        padding: 8px;
+    }
+
+    .user-table th, .user-table td {
+        font-size: 14px;
+    }
+
+    .profile-img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* Sidebar toggle button for mobile */
+.sidebar-toggler {
+    display: none;
+    font-size: 30px;
+    color: #000;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+}
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #f8f9fa;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 100;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        transition: margin-left 0.3s ease-in-out;
+    }
+
+    .main-content.show-sidebar {
+        margin-left: 250px;
+    }
+
+    .sidebar-toggler {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        font-size: 30px;
+        color: #000;
+        z-index: 1000;
+    }
+}
+
+/* Ensure the cards are spaced evenly and prevent overlap */
+.stat-card {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.col-md-3 {
+    flex: 1 1 22%;
+    margin: 10px;
+}
+
+.table-heading {
+    margin-top: 30px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Adjustments to the table for better readability */
+.user-table th, .user-table td {
+    padding: 12px;
+    text-align: center;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.log-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.log-btn:hover {
+    background-color: #0056b3;
+}
+
+.log-details ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.log-details li {
+    padding: 5px 0;
+}
+
+/* Manage Users Section */
+.manage-search {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px;
+    font-size: 16px;
+    width: 200px;
+}
+
+.role-filter {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.add-user-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-user-btn:hover {
+    background-color: #45a049;
+}
+
+.user-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.user-list-table th, .user-list-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.user-list-table th {
+    background-color: #f2f2f2;
+}
+
+.user-list-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.user-list-table .status-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.user-list-table .status-toggle input[type="checkbox"] {
+    width: 50px;
+    height: 24px;
+    appearance: none;
+    background-color: #ddd;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.user-list-table .status-toggle input[type="checkbox"]:checked {
+    background-color: #4CAF50;
+}
+
+.user-list-table .status-toggle input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 50%;
+    transition: left 0.3s;
+}
+
+.user-list-table .status-toggle input[type="checkbox"]:checked::before {
+    left: 25px;
+}
+
+.activity-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.activity-log-table th, .activity-log-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.activity-log-table th {
+    background-color: #f2f2f2;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Ensures modal is above other content */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent black background */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%; /* Ensure it takes up a majority of the screen */
+    max-width: 1200px; /* Ensure max width for larger screens */
+    text-align: center;
+    border: 1px solid #888;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
+}
+
+.close-btn {
+    color: #aaa;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Styling for the iframe inside the modal */
+#pdfIframe {
+    width: 100%; /* Full width of the modal */
+    height: 500px; /* Adjust height as necessary */
+    border: none;
+}
+
+
+.btn-email {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.btn-email:hover {
+    background-color: #0056b3;
+}
+
+/* ===============================
+   Leads Section - Custom Styling
+   =============================== */
+
+/* General leads container */
+#leads {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Header Styling */
+#leads h2, #leads h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Table Styling */
+#leads .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+#leads .table thead {
+    background: #007bff;
+    color: white;
+}
+
+#leads .table th, 
+#leads .table td {
+    padding: 12px;
+    text-align: center;
+}
+
+#leads .table tbody tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+#leads .table tbody tr:hover {
+    background: #dbeafe;
+    transition: 0.3s;
+}
+
+/* Chart Container */
+#leads div[style*="position: relative;"] {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Dropdown Styling */
+#activityFilter, 
+#theme-setting {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+#activityFilter:hover, 
+#theme-setting:hover {
+    background: #eef2ff;
+}
+
+/* Save Settings Button */
+#leads button {
+    background: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: 10px;
+}
+
+#leads button:hover {
+    background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #leads {
+        padding: 15px;
+    }
+
+    #leads .table th, 
+    #leads .table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    #activityFilter, 
+    #theme-setting {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    #leads button {
+        width: 100%;
+        font-size: 14px;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.timeline-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    width: 250px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(14px);
+}
