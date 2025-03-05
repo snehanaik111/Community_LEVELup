@@ -1,0 +1,2933 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher's Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/css/chatbot.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid d-flex align-items-center justify-content-between mt-2">
+                <!-- Logo and Title -->
+                <div class="dashboard-header d-flex align-items-center">
+                    <img src="/static/images/logo_trans.png" alt="Teacher's Dashboard Logo" class="dashboard-logo">
+                    <h2 class="dashboard-title mb-0 ms-2">Teacher's Dashboard</h2>
+                </div>
+    
+                <!-- Notifications & User Info -->
+                <div class="d-flex align-items-center">
+                    <!-- User Info & Notification Bell -->
+                    <div class="d-flex align-items-center" style="gap: 15px;">
+                        <!-- Notification Bell -->
+                        <div class="position-relative">
+                            <i class="fas fa-bell fa-lg" id="notification-bell" style="cursor: pointer;"></i>
+                            <span id="notification-count" class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="display: none;"></span>
+                        </div>
+    
+                        <!-- User Info -->
+                        <div class="user-info d-flex align-items-center">
+                            <span id="user-name" class="fw-bold text-white">Logged in as: <strong id="logged-user">frank ocean</strong></span>
+                            <img id="logged-user-img" src="/static/images/default-user.png" alt="Profile" class="user-avatar rounded-circle ms-2" width="40" height="40" onclick="toggleSettingsButton()">
+                            <button id="floating-settings-btn" class="floating-btn" onclick="navigateToSettings()">Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+
+
+    <!-- Notifications Modal -->
+<div id="notifications-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="notifications-list" class="list-group">
+                    <li class="list-group-item">Loading...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="sidebar" id="sidebar">
+        
+        <!-- Display Logged-In User -->
+<br>
+
+
+        <a href="#" onclick="loadContent('dashboard')" class="active">Dashboard</a>
+       <!--  <a href="#" onclick="loadContent('planner')">Planner</a>
+        <a href="#" onclick="loadContent('worksheets')">Worksheets</a>
+        <a href="#" onclick="loadContent('flashcards')">Flashcards</a>
+        <a href="#" onclick="loadContent('stories')">Stories</a>
+        <a href="#" onclick="loadContent('announcements')">Announcements</a> -->
+        <a href="#reports" onclick="loadContent('reports')">Reports</a>
+        
+     
+
+<!-- Sidebar Link -->
+<a href="javascript:void(0);" onclick="toggleCommunity(); showCommunityPopup()">Community ▽</a>
+
+
+<!-- Community Submenu (Toggles Open) -->
+<div id="community-container" style="display: none;">
+    <ul>
+    <a href="#chat" onclick="loadContent('chat')">Chat</a>
+    <a href="#qna" onclick="loadContent('qna')">Q&A</a>
+    <a href="#askE;" onclick="loadContent('askE')">Ask the Expert</a>
+</ul>
+</div>
+        <a href="#founderSpeaks" onclick="loadContent('founder')">Founder Speaks</a>
+        <a href="#settings" onclick="loadContent('settings')">Settings</a>
+        <a href="/logout" class="nav-link">Logout</a></li>
+        
+    
+    </div>
+    <span class="menu-toggle" onclick="toggleSidebar()">&#9776;</span>
+    <div class="content" id="main-content">
+        
+
+<!-- Dashboard Section -->
+<div id="dashboard" class="content-page">
+    <h3>Welcome to the Teacher's Dashboard</h3>
+    <div class="row g-4">
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-file-alt fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Worksheets Used</h5>
+                    <p class="card-text">3/10</p>
+                    <!-- Generate Worksheet Button -->
+                    <button class="btn btn-primary" onclick="loadContent('worksheets')">Generate Worksheet</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-center p-3" onclick="logActivity('Upcoming Events')">
+                <div class="card-body">
+                    <i class="fas fa-calendar-alt fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">Upcoming Events</h5>
+                    <p class="card-text">February 12 2025</p>
+                    <!-- Generate Worksheet Button -->
+                    <button class="btn btn-success" onclick="loadContent('announcements')">View Calender</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-center p-3" onclick="logActivity('Flashcards Used')">
+                <div class="card-body">
+                    <i class="fas fa-book fa-3x mb-3 text-danger"></i>
+                    <h5 class="card-title">Flashcards Used</h5>
+                    <p class="card-text">5/10</p>
+                    <!-- Generate Worksheet Button -->
+                    <button class="btn btn-danger" onclick="loadContent('flashcards')">Generate Flashcard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+  <!-- Recent Activity Section -->
+<div class="mb-3">
+    <h3 class="mb-2">Recent Activity</h3> 
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex gap-2">
+            <button id="my-activity-btn" class="btn btn-outline-secondary active" onclick="fetchFilteredActivityLogs('user', 1)">
+                My Activity
+            </button>
+        
+            <button id="all-activity-btn" class="btn btn-outline-secondary" onclick="fetchFilteredActivityLogs('all', 1)">
+                All Users' Activity
+            </button>
+        </div>
+
+        <!-- Search & Filter Section -->
+        <div class="d-flex align-items-center gap-2">
+              <!-- Filter Dropdown -->
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Filter
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="filterActivity('latest')">Latest Generated</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="filterActivity('oldest')">Oldest Generated</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="filterActivity('worksheets')">Worksheets</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="filterActivity('flashcards')">Flashcards</a></li>
+                </ul>
+            </div>
+            <!-- Search Bar -->
+            <div class="input-group" style="max-width: 300px; height: 38px;">
+                <input type="text" id="search-input" class="form-control" placeholder="Search activity..." style="height: 38px;">
+               
+            </div>
+            <button class="btn btn-primary" style="height: 38px; margin-bottom: 1px;" onclick="searchActivity()">Search</button>
+
+          
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    <!-- Recent Activity Table -->
+    
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Worksheet</th>
+                <th>Date</th>
+                <th>Source</th>
+                <th>PDF</th>
+            </tr>
+        </thead>
+        <tbody id="pdf-log-body"></tbody>
+    </table>
+
+    <!-- Modal for PDF Preview -->
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalLabel">PDF Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="pdfIframe" width="100%" height="100%" style="border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pagination-controls" class="mt-3"></div>
+</div>
+
+
+<!-- Reports Section -->
+<div id="reports" class="content-page" style="display:none;">
+    <h1 class="text-center">📊 Reports & Analytics</h1>
+
+    <!-- Download Statistics (Cards Left, Chart Right) -->
+    <div class="report-card download-stats">
+        <div class="left-content">
+            <h3>📥 Download Statistics</h3>
+            <div class="stat-box">
+                <h5>Worksheets Downloaded</h5>
+                <p><span id="worksheets-downloaded">{{total_worksheets}}</span></p>
+            </div>
+            <div class="stat-box">
+                <h5>Flashcards Downloaded</h5>
+                <p><span id="flashcards-downloaded">{{total_flashcards}}</span></p>
+            </div>
+            <div class="stat-box">
+                <h5>Most Downloaded Resource</h5>
+                <p><span id="most-downloaded">-</span></p>
+            </div>
+        </div>
+        <div class="right-content">
+            <canvas id="resource-downloads-chart"></canvas>
+            <button id="back-to-weekly" class="btn btn-secondary mt-3" style="display: none;" onclick="renderWeeklyChart()">🔄 Back to Weekly View</button>
+
+        </div>
+    </div>
+
+    
+   <!-- User Engagement (Stacked) -->
+<div class="report-card user-engagement">
+    <h3>👥 User Engagement</h3>
+
+    <div class="engagement-content">
+        <div class="stats-container">
+            <div class="stat-box">
+                <h5>Messages in Community Chat</h5>
+                <p><span id="messages-sent">0</span></p>
+            </div>
+            <div class="stat-box">
+                <h5>Forum Posts</h5>
+                <p><span id="forum-posts">0</span></p>
+            </div>
+            <div class="stat-box">
+                <h5>Q&A Contributions</h5>
+                <p><span id="qa-questions">0</span></p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="engagement-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/get_user_contributions")
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error fetching contributions:", data.error);
+                    return;
+                }
+
+                // Update text stats
+                document.getElementById("messages-sent").innerText = data.chat_messages;
+                document.getElementById("forum-posts").innerText = data.forum_posts;
+                document.getElementById("qa-questions").innerText = data.qa_answers;
+
+                // Render Chart
+                const ctx = document.getElementById("engagement-chart").getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["Chat Messages", "Forum Posts", "Q&A Contributions"],
+                        datasets: [{
+                            label: "User Contributions",
+                            data: [data.chat_messages, data.forum_posts, data.qa_answers],
+                            backgroundColor: ["#4CAF50", "#FF9800", "#2196F3"]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Fetch error:", error));
+    });
+</script>
+
+
+
+    <!-- Personalized Recommendations (Stacked) -->
+    <div class="report-card">
+        <h3>🎯 Recommended for You</h3>
+        <div class="recommendation-list">
+            <div class="recommendation-card">Phonics Blends Worksheet</div>
+            <div class="recommendation-card">CVC Words Practice</div>
+            <div class="recommendation-card">Vowel Teams Worksheet</div>
+        </div>
+        <div class="create-worksheet">
+            <a href="/chatbot" class="create-worksheet-btn">+ Create More Worksheets and Flashcards</a>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="founder" class="content-page">
+    <div class="founder-wrapper">
+
+
+        <div class="founder-container">
+            <!-- Meet the Founder (Left) -->
+            <div class="meet-founder">
+                <h3 class="founder-heading">Meet Our Founder</h3>
+                <div class="founder-content">
+                    <img src="/static/images/founder.png" alt="Founder" class="founder-photo">
+                    <div class="founder-message">
+                        <p><strong>Welcome!</strong> At LevelUP, we are passionate about transforming phonics education through innovative, multi-sensory learning experiences.</p>
+                        <p>Our journey began with a vision to make learning more engaging and accessible. We equip educators with cutting-edge techniques that inspire young learners to explore language with confidence.</p>
+                        <p>Join us as we shape the future of education, one sound at a time!</p>
+                        <p class="founder-signature">- Keena Shah</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+         <!-- Wise Words from the Founder (Right) -->
+         <div class="wise-words">
+            <h3 class="founder-heading">Wise Words from the Founder</h3>
+            <div id="founderMessages" class="timeline"></div>
+
+        <!-- Message Input Box (Only for Founder) -->
+        <div id="postMessageContainer" class="hidden">
+            <textarea id="founderMessageInput" placeholder="Write a message..."></textarea>
+            <button onclick="postFounderMessage()">Post</button>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+ 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    checkFounderAccess();  
+    fetchFounderMessages();  
+});
+
+// Fetch and display messages in a timeline format
+function fetchFounderMessages() {
+    fetch('/get_founder_messages')
+    .then(response => response.json())
+    .then(messages => {
+        const messageContainer = document.getElementById("founderMessages");
+        messageContainer.innerHTML = "";
+
+        messages.forEach(msg => {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("timeline-item");
+            messageDiv.innerHTML = `
+                <div class="timeline-content">
+                    <p>${msg.message}</p>
+                    <small class="timestamp">${msg.timestamp}</small>
+                </div>
+            `;
+            messageContainer.appendChild(messageDiv);
+        });
+    })
+    .catch(error => console.error("Error fetching messages:", error));
+}
+    
+    // Function to allow the founder to post a message
+    function postFounderMessage() {
+        const message = document.getElementById("founderMessageInput").value;
+        if (!message.trim()) return alert("Message cannot be empty!");
+    
+        fetch("/post_founder_message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            document.getElementById("founderMessageInput").value = ""; // Clear input
+            fetchFounderMessages(); // Refresh messages
+        })
+        .catch(error => console.error("Error posting message:", error));
+    }
+    
+    // Ensure only the founder can post messages
+function checkFounderAccess() {
+    fetch('/get_user_profile')
+    .then(response => response.json())
+    .then(user => {
+        if (user.email === "snehafrankocean@gmail.com") {
+            document.getElementById("postMessageContainer").classList.remove("hidden");
+        }
+    })
+    .catch(error => console.error("Error checking user:", error));
+}
+    </script>
+    
+
+
+
+
+
+        <!-- Planner Section -->
+        <div id="settings" class="content-page" style="display:none;">
+            <h3>Settings</h3>
+        
+            <!-- Profile Management -->
+            <section class="settings-section">
+                <h4>Profile Management</h4>
+                <label>Name: <input type="text" id="teacher-name" disabled /></label>
+                <label>Email: <input type="email" id="teacher-email" disabled /></label>
+                <label>Profile Picture:</label>
+                <div class="profile-pic-container">
+                    <img id="profile-pic-preview" src="" alt="Profile Picture" />
+                </div>
+               <!--    <label>New Password: <input type="password" id="new-password" /></label>
+                <button onclick="saveProfile()">Save Changes</button>-->
+            </section>
+        
+            <!-- Subscription & Billing -->
+            <section class="settings-section">
+                <h4>Subscription & Billing</h4>
+                <p>Current Plan: <span id="current-plan">Free</span></p>
+                <button onclick="subscribe('Monthly', 10)">Subscribe</button>
+                
+            </section>
+        
+            <!-- Account Management -->
+            <section class="settings-section">
+                <h4>Account Management</h4>
+                <button onclick="logout()">Log Out</button>
+                <button class="delete-btn" onclick="confirmDeleteAccount()">Delete Account</button>
+            </section>
+        </div>
+        
+        <script>
+            async function loadUserProfile() {
+                try {
+                    let response = await fetch('/get_user_profile');
+                    let data = await response.json();
+                    
+                    if (data.error) throw new Error(data.error);
+                    
+                    document.getElementById('teacher-name').value = data.name;
+                    document.getElementById('teacher-email').value = data.email;
+                    document.getElementById('profile-pic-preview').src = data.picture || "/static/images/default-user.png";
+                } catch (error) {
+                    console.error("Error loading user profile:", error);
+                }
+            }
+        
+            async function saveProfile() {
+                try {
+                    let password = document.getElementById('new-password').value;
+        
+                    let response = await fetch('/update_profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password })
+                    });
+        
+                    let result = await response.json();
+                    if (result.success) alert("Profile updated successfully!");
+                    else throw new Error(result.error);
+                } catch (error) {
+                    console.error("Error updating profile:", error);
+                }
+            }
+        
+            async function subscribe(plan, amount) {
+    // Redirect to backend route with plan details
+    window.location.href = `/pay?plan=${plan}&amount=${amount}`;
+}
+        
+function confirmDeleteAccount() {
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+        deleteAccount();
+    }
+}
+
+async function deleteAccount() {
+    try {
+        let response = await fetch('/delete_account', { method: 'POST' });
+        let result = await response.json();
+
+        if (result.success) {
+            alert("Your account has been deleted."); // Show popup message
+            window.location.href = "/login"; // Redirect to login page
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error("Error deleting account:", error);
+    }
+}
+
+        
+            async function logout() {
+                window.location.href = "/logout";
+            }
+        
+            // Load user profile on page load
+            document.addEventListener("DOMContentLoaded", loadUserProfile);
+        </script>
+        
+
+
+ <!-- Chat Section -->
+<div id="chat" class="content-page" style="display:none;">
+    <h3 class="section-title">Community Chat - Phonics Practice</h3>
+           <!-- Display Logged-In User -->
+<div class="user-info d-flex align-items-center mb-3">
+    <img id="logged-user-img" src="/static/images/default-user.png" alt="Profile" class="user-avatar rounded-circle me-2" width="40" height="40">
+    <span id="user-name">Logged in as: <strong id="logged-user">Guest</strong></span>
+</div>
+
+    <!-- Chat Room Tabs -->
+    <div class="chat-tabs">
+        <button class="tab-btn active" onclick="switchRoom('letter-sounds')">Letter Sounds</button>
+        <button class="tab-btn" onclick="switchRoom('blending')">Blending</button>
+        <button class="tab-btn" onclick="switchRoom('tricky-words')">Tricky Words</button>
+        <button class="tab-btn" onclick="switchRoom('sentence-practice')">Sentence Practice</button>
+    </div>
+
+    <!-- Chat Box -->
+    <div id="chat-box" class="chat-box"></div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-container">
+        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+
+
+
+<script>
+    let chatRooms = {
+     "letter-sounds": [],
+     "blending": [],
+     "tricky-words": [],
+     "sentence-practice": []
+ };
+ 
+ 
+ function switchRoom(room) {
+     currentRoom = room;
+     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+     document.querySelector(`[onclick="switchRoom('${room}')"]`).classList.add("active");
+     fetchChatMessages(room);
+ }
+ 
+ // Fetch chat messages dynamically
+ function fetchChatMessages(room) {
+     fetch(`/get_messages/${room}`)
+         .then(response => response.json())
+         .then(messages => {
+             let chatBox = document.getElementById("chat-box");
+             chatBox.innerHTML = "";
+             messages.forEach(msg => {
+                 chatBox.innerHTML += `
+                     <div class="chat-message">
+                         <img src="${msg.profile_picture}" class="chat-avatar">
+                         <div>
+                             <strong>${msg.username}</strong>: ${msg.message}
+                             <small>(${msg.timestamp})</small>
+                         </div>
+                     </div>`;
+             });
+         });
+ }
+
+    // Send a message without overwriting chat
+function sendMessage() {
+    let message = document.getElementById("chat-input").value;
+    if (!message.trim()) return;
+
+    fetch('/send_message', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ room: currentRoom, message: message })
+    })
+    .then(() => {
+        fetchChatMessages(currentRoom);
+        document.getElementById("chat-input").value = "";
+    });
+}
+
+
+
+
+
+
+    function displayMessage(sender, message) {
+        let chatBox = document.getElementById("chat-box");
+        let messageDiv = document.createElement("div");
+        messageDiv.classList.add("message");
+        
+        if (sender === userName) {
+            messageDiv.classList.add("user-message");
+        } else {
+            messageDiv.classList.add("other-message");
+        }
+
+        messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+    }
+
+    function loadChatMessages() {
+        let chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML = "";
+        chatRooms[currentRoom].forEach(msg => displayMessage(msg.sender, msg.text));
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    }
+
+    // Simulated chat messages
+    setTimeout(() => chatRooms["letter-sounds"].push({ sender: "JohnDoe", text: "Let's practice letter sounds!" }), 2000);
+    setTimeout(() => chatRooms["blending"].push({ sender: "Alice", text: "How do you blend 'sh' and 'ee'?" }), 4000);
+</script>
+
+
+
+
+  <!-- Planner Section -->
+  <div id="qna" class="content-page" style="display:none;">
+    <h3 class="section-title">Q&A - Phonics Challenges</h3>
+    
+    <!-- Display Logged-In User -->
+    <div class="user-info d-flex align-items-center mb-3">
+        <img id="logged-user-img" src="/static/images/default-user.png" alt="Profile" class="user-avatar rounded-circle me-2" width="40" height="40">
+        <span id="user-name">Logged in as: <strong id="logged-user">Guest</strong></span>
+    </div>
+    
+    <div class="qa-container d-flex flex-wrap">
+        <!-- Q&A Chat Section -->
+        <div class="qa-chat flex-grow-1 p-3 bg-white rounded shadow">
+            <div class="qa-input-container mb-3 d-flex">
+                <input type="text" id="qa-question" class="form-control me-2" placeholder="Ask a question...">
+                <button class="btn btn-success" onclick="addQuestion()">Ask</button>
+            </div>
+            <ul id="qa-list" class="qa-list list-group"></ul>
+        </div>
+    
+        <!-- Top Contributors Section -->
+        <div class="top-contributors-container p-3 border rounded bg-light">
+            <h3 class="text-center">🏆 Top Contributors</h3>
+            <ul id="top-contributors-list" class="list-group">
+                <li class="list-group-item">Loading...</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+// Function to fetch and update the Top Contributors leaderboard
+function fetchTopContributors() {
+    fetch("/get_top_contributors")
+        .then(response => response.json())
+        .then(data => updateTopContributorsUI(data))
+        .catch(error => console.error("Error fetching contributors:", error));
+}
+
+// Function to update the Top Contributors UI
+function updateTopContributorsUI(contributors) {
+    let list = document.getElementById("top-contributors-list");
+    list.innerHTML = ""; // Clear previous content
+
+    if (contributors.length === 0) {
+        list.innerHTML = "<li class='list-group-item'>No contributors yet</li>";
+        return;
+    }
+
+    contributors.forEach((user, index) => {
+        let rankBadge = "🥉 Bronze";
+        if (index === 0) rankBadge = "🥇 Gold";
+        else if (index === 1) rankBadge = "🥈 Silver";
+
+        let listItem = document.createElement("li");
+        listItem.classList.add("list-group-item", "d-flex", "align-items-center", "justify-content-between");
+
+        listItem.innerHTML = `
+            <div class="d-flex align-items-center">
+                <img src="${user.picture || '/static/images/default-user.png'}" class="user-avatar me-2 rounded-circle" width="40" height="40">
+                <strong>${user.name}</strong>
+            </div>
+            <span class="badge bg-primary">${user.points} pts</span>
+            <span>${rankBadge}</span>
+        `;
+        list.appendChild(listItem);
+    });
+}
+
+// Fetch the leaderboard every 5 seconds
+setInterval(fetchTopContributors, 5000);
+document.addEventListener("DOMContentLoaded", fetchTopContributors);
+
+
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchQuestions();
+        fetchUserProfile();
+    });
+    
+   // Fetch and update logged-in user info
+// Fetch user profile and update UI
+async function fetchUserProfile() {
+    try {
+        let response = await fetch('/get_user_profile');
+        let data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        // Update all user profile sections
+        document.querySelectorAll("#logged-user").forEach(el => el.innerText = data.name);
+        document.querySelectorAll("#logged-user-img").forEach(el => el.src = data.picture || "/static/images/default-user.png");
+
+    } catch (error) {
+        console.error("Error loading user profile:", error);
+    }
+}
+
+function fetchReportsData() {
+    fetch("/reports_data")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("messages-sent").innerText = data.total_messages;
+            document.getElementById("forum-posts").innerText = data.total_questions;
+            document.getElementById("qa-questions").innerText = data.total_expert_questions;
+        })
+        .catch(error => {
+            console.error("Error fetching reports data:", error);
+        });
+}
+
+        
+// Function to fetch and update Q&A dynamically every 5 seconds
+function fetchQuestions() {
+    fetch("/get_questions")
+        .then(response => response.json())
+        .then(data => updateQuestionsUI(data))
+        .catch(error => console.error("Error fetching questions:", error));
+}
+
+// Function to update Q&A UI dynamically
+function updateQuestionsUI(questions) {
+    let qaList = document.getElementById("qa-list");
+    qaList.innerHTML = ""; // Clear previous content
+
+    questions.forEach(q => {
+        let qItem = document.createElement("li");
+        qItem.classList.add("question-item");
+
+        qItem.innerHTML = `
+            <div class="question-header">
+                <img src="${q.user_picture}" class="user-avatar">
+                <strong class="question-user">${q.username}</strong>
+                <small class="question-time">(${q.timestamp})</small>
+            </div>
+            <div class="question-text">${q.question_text}</div>
+
+            <!-- Answer Section -->
+            <ul id="answers-${q.id}" class="answers-list">
+                ${q.answers.map(a => `
+                    <li class="answer-item">
+                        <div class="answer-header">
+                            <img src="${a.user_picture}" class="user-avatar">
+                            <strong>${a.username}</strong>
+                        </div>
+                        <div class="answer-text">${a.answer_text}</div>
+                        <small class="answer-time">(${a.timestamp})</small>
+                    </li>
+                `).join('')}
+            </ul>
+
+            <!-- Reply Input -->
+            <div class="answer-input-container">
+                <input type="text" id="answer-${q.id}" placeholder="Write an answer..." required>
+                <button onclick="addAnswer(${q.id})">Reply</button>
+            </div>
+        `;
+
+        qaList.appendChild(qItem);
+    });
+}
+
+// Function to display Bootstrap alert modals
+function showBootstrapAlert(title, message) {
+    document.getElementById("alertModalLabel").innerText = title;
+    document.getElementById("alertModalBody").innerText = message;
+    let alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+    alertModal.show();
+}
+
+// Add a question with dynamic UI update
+function addQuestion() {
+    const questionInput = document.getElementById("qa-question");
+    const questionText = questionInput.value.trim();
+
+    if (!questionText) {
+        showBootstrapAlert("Warning", "⚠️ Please enter a question.");
+        return;
+    }
+
+    fetch("/ask_question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: questionText })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            questionInput.value = "";
+            fetchQuestions();  // ✅ Reload questions
+        } else {
+            showBootstrapAlert("Error", "⚠️ Error posting question.");
+        }
+    })
+    .catch(error => console.error("Error adding question:", error));
+}
+
+// Add an answer with dynamic UI update
+function addAnswer(questionId) {
+    const answerInput = document.getElementById(`answer-${questionId}`);
+    const answerText = answerInput.value.trim();
+
+    if (!answerText) {
+        showBootstrapAlert("Warning", "⚠️ Please enter an answer.");
+        return;
+    }
+
+    fetch("/answer_question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question_id: questionId, answer: answerText })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            answerInput.value = "";
+            fetchQuestions(); // Refresh Q&A
+        } else {
+            showBootstrapAlert("Error", "⚠️ Error posting answer.");
+        }
+    });
+}
+
+// Automatically refresh Q&A every 5 seconds
+setInterval(fetchQuestions, 2000);
+
+// Load questions when page loads
+document.addEventListener("DOMContentLoaded", function() {
+    fetchQuestions();
+});
+
+    </script>
+    
+
+
+ <!-- Planner Section -->
+ <div id="askE" class="content-page" style="display:none;">
+    <h3 class="section-title">Ask an Expert - Phonics Inquiry</h3>
+           <!-- Display Logged-In User -->
+<div class="user-info d-flex align-items-center mb-3">
+    <img id="logged-user-img" src="/static/images/default-user.png" alt="Profile" class="user-avatar rounded-circle me-2" width="40" height="40">
+    <span id="user-name">Logged in as: <strong id="logged-user">Guest</strong></span>
+</div>
+    <textarea id="expert-question" placeholder="Write your question..."></textarea>
+    <button onclick="submitExpertQuestion()">Submit</button>
+</div>
+
+
+   <!-- Worksheets Section Container -->
+<div id="worksheets" class="content-page" style="display:none;">
+    <div class="container my-5">
+        <div class="shadow p-4 rounded bg-white">
+            <h3>Worksheets Section</h3>
+            
+            
+
+            <!-- Topic Selection Buttons -->
+            <div class="mb-3">
+                <h5>Select a Topic:</h5>
+                <div id="topic-buttons" class="btn-group-horizontal" role="group">
+                    <button type="button" class="btn btn-primary mb-2" data-value="Synthetic Phonics">Synthetic Phonics</button>
+                    <button type="button" class="btn btn-primary mb-2" data-value="Systematic Synthetic Approach">Systematic Synthetic Approach</button>
+                    <button type="button" class="btn btn-primary mb-2" data-value="Fundamental Phonics Rules">Fundamental Phonics Rules</button>
+                    <button type="button" class="btn btn-primary mb-2" data-value="5 Major Principles Of Phonics">5 Major Principles Of Phonics</button>
+                    <button type="button" class="btn btn-primary mb-2" data-value="Jolly Phonics Methodology">Jolly Phonics Methodology</button>
+                    <button type="button" class="btn btn-primary mb-2" data-value="42 Sounds With Actions">42 Sounds With Actions</button>
+                    <!-- Hidden extra options -->
+                    <div id="extra-topics" style="display:none;">
+                        <button type="button" class="btn btn-primary mb-2" data-value="Blending & Segmenting">Blending & Segmenting</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Tricky Words">Tricky Words</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Alternatives">Alternatives</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Diagraphs & Trigraphs">Diagraphs & Trigraphs</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Sight Words">Sight Words</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Rhyming Words">Rhyming Words</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Long & Short Vowel">Long & Short Vowel</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Learning Phonograms">Learning Phonograms</button>
+                        <button type="button" class="btn btn-primary mb-2" data-value="Stories & Actions">Stories & Actions</button>
+                    </div>
+                    <button type="button" class="btn btn-link" id="show-more-topics">+ More</button>
+                </div>
+            </div>
+
+            <!-- Age Group Selection Buttons -->
+            <div class="mb-3">
+                <h5>Select Age Group:</h5>
+                <div id="age-buttons" class="btn-group-horizontal" role="group">
+                    <button type="button" class="btn btn-secondary mb-2" data-value="2-4">2-4 Years</button>
+                    <button type="button" class="btn btn-secondary mb-2" data-value="4-5">4-5 Years</button>
+                    <button type="button" class="btn btn-secondary mb-2" data-value="5-10">5-10 Years</button>
+                    <!-- Hidden extra options -->
+                    <div id="extra-age-groups" style="display:none;">
+                        <button type="button" class="btn btn-secondary mb-2" data-value="6-8">6-8 Years</button>
+                        <button type="button" class="btn btn-secondary mb-2" data-value="9-12">9-12 Years</button>
+                    </div>
+                    <button type="button" class="btn btn-link" id="show-more-age-groups">+ More</button>
+                </div>
+            </div>
+
+            <!-- Number of Questions Selection -->
+<div class="mb-3">
+    <h5>Select Number of Questions:</h5>
+    <div id="question-buttons" class="btn-group-horizontal" role="group">
+        <button type="button" class="btn btn-info mb-2" data-value="5">5 Questions</button>
+        <button type="button" class="btn btn-info mb-2" data-value="10">10 Questions</button>
+        <button type="button" class="btn btn-warning mb-2 premium-only" data-value="15">15 Questions (Premium)</button>
+    </div>
+</div>
+
+            <button class="btn btn-success" onclick="generateWorksheet()">Generate AI Worksheet</button>
+            <div id="worksheet-display" class="mt-4"></div> <!-- Display selected worksheet here -->
+         <!-- Add a container for displaying the PDF with scrolling -->
+<div id="pdf-viewer-container" style="width: 100%; height: 500px; overflow: auto; display: none;">
+    <canvas id="pdf-canvas"></canvas>
+</div>
+
+        </div>
+    </div>
+</div>
+
+
+      <!-- Flashcards Section -->
+<div id="flashcards" class="content-page" style="display:none;">
+    <h3>Flashcards Section</h3>
+    
+    
+    <!-- Topic Selection Dropdown -->
+    <div class="mb-3">
+        <h5>Select a Topic:</h5>
+        <select id="topic-dropdown1" class="form-control">
+            <option value="">Select a Topic</option>
+            <option value="Synthetic Phonics">Synthetic Phonics</option>
+            <option value="Systematic Synthetic Approach">Systematic Synthetic Approach</option>
+            <option value="Fundamental Phonics Rules">Fundamental Phonics Rules</option>
+            <option value="5 Major Principles Of Phonics">5 Major Principles Of Phonics</option>
+            <option value="Jolly Phonics Methodology">Jolly Phonics Methodology</option>
+            <option value="42 Sounds With Actions">42 Sounds With Actions</option>
+            <option value="Blending & Segmenting">Blending & Segmenting</option>
+            <option value="Tricky Words">Tricky Words</option>
+            <option value="Alternatives">Alternatives</option>
+            <option value="Diagraphs & Trigraphs">Diagraphs & Trigraphs</option>
+            <option value="Sight Words">Sight Words</option>
+            <option value="Rhyming Words">Rhyming Words</option>
+            <option value="Long & Short Vowel">Long & Short Vowel</option>
+            <option value="Learning Phonograms">Learning Phonograms</option>
+            <option value="Stories & Actions">Stories & Actions</option>
+        </select>
+    </div>
+
+    <!-- Age Group Selection -->
+    <div class="mb-3">
+        <h5>Select Age Group:</h5>
+        <select id="age-dropdown1" class="form-control">
+            <option value="">Select an Age Group</option>
+            <option value="2-4">2-4 Years</option>
+            <option value="4-5">4-5 Years</option>
+            <option value="5-10">5-10 Years</option>
+        </select>
+    </div>
+
+    <!-- Start Flashcards Button -->
+    <div class="mb-3">
+        <button class="btn btn-primary" onclick="generateFlashcards()">Generate AI Flashcards</button>
+    </div>
+
+
+    <div id="flashcards-display" class="d-flex flex-wrap justify-content-center mt-4"></div>
+
+
+
+<!-- Download Flashcards Button (Hidden Initially) -->
+<div id="flashcards-display"></div>
+<button id="downloadFlashcardBtn" class="btn btn-primary" style="display:none;">Download Flashcards</button>
+
+
+
+    <!-- Flashcard Container -->
+    <div id="flashcard-container" class="d-flex justify-content-center mt-4">
+        <div id="loading-popup" class="popup" style="display:none;">
+            <div class="popup-content">
+                <h3 id="loading-message">Loading...</h3>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+
+
+        <!-- Stories Section -->
+        <div id="stories" class="content-page" style="display:none;">
+            <h3>Stories Section</h3>
+            <p>Details about stories go here...</p>
+        </div>
+
+         <!-- Announcements Section -->
+    <div id="announcements" class="content-page" style="display:block;">
+        <h3>Upcoming Events</h3>
+        <div id="calendar" class="calendar-container">
+            <div class="calendar-header">
+                <button id="prev-month" onclick="changeMonth(-1)" class="btn btn-outline-primary">&#8592; Previous</button>
+                <h3 id="calendar-month-year"></h3>
+                <button id="next-month" onclick="changeMonth(1)" class="btn btn-outline-primary">Next &#8594;</button>
+            </div>
+            
+            <!-- Weekdays Row -->
+            <div class="weekdays">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid"></div>
+        </div>
+    </div>
+
+    <!-- Event Pop-up -->
+<div id="event-popup" class="popup" style="display:none;">
+    <div class="popup-content">
+        <h3 id="event-title"></h3>
+        <p><strong>Date & Time:</strong> <span id="event-date-time"></span></p>
+        <p><strong>Payment:</strong> <span id="event-payment"></span></p>
+
+        <!-- Enrollment Status -->
+        <div id="enrollment-section">
+            <button id="enroll-button" class="btn btn-success" style="display: none;">Enroll Now</button>
+            <p id="enrolled-message" class="text-success" style="display: none;">✅ Already Enrolled</p>
+        </div>
+
+        <button onclick="closePopup()" class="btn btn-danger mt-3">Close</button>
+    </div>
+</div>
+
+<script>
+    async function checkEnrollment(eventId) {
+        try {
+            const response = await fetch(`/check_enrollment?event_id=${eventId}`);
+            const data = await response.json();
+            if (data.enrolled) {
+                document.getElementById("enrolled-message").style.display = "block";
+                document.getElementById("enroll-button").style.display = "none";
+            } else {
+                document.getElementById("enroll-button").style.display = "block";
+                document.getElementById("enroll-button").onclick = function() {
+                    window.location.href = `/pay?event_id=${eventId}&amount=10`; // Adjust amount dynamically if needed
+                };
+            }
+        } catch (error) {
+            console.error("Error checking enrollment:", error);
+        }
+    }
+
+    function openEventPopup(eventId, title, dateTime, payment) {
+        document.getElementById("event-title").innerText = title;
+        document.getElementById("event-date-time").innerText = dateTime;
+        document.getElementById("event-payment").innerText = payment;
+        document.getElementById("event-popup").style.display = "block";
+
+        checkEnrollment(eventId);
+    }
+
+    function closePopup() {
+        document.getElementById("event-popup").style.display = "none";
+    }
+</script>
+
+
+    
+
+    <!-- Bootstrap JS (optional, for pop-up functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+  </div>
+
+    <script>
+        function loadContent(sectionId) {
+            const sections = document.querySelectorAll('.content-page');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.style.display = 'block';
+            }
+
+            // Update active link in sidebar
+            document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Default content
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContent('dashboard');
+        });
+
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("show");
+        }
+
+
+        async function fetchAIResponse(prompt) {
+    showLoadingPopup("Generating AI response...");
+
+    try {
+        const API_KEY = "AIzaSyAnZ0uKvz6RYXtJ5unthE0PBFXKLZpJDQo";  // Replace with your actual key
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.message || "Unknown error"}`);
+        }
+
+        const data = await response.json();
+        console.log("🔍 Full API Response:", data);
+
+        hideLoadingPopup();
+
+        if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content.parts[0].text) {
+            alert("Error: AI response is missing expected content.");
+            return null;
+        }
+
+        let aiResponse = data.candidates[0].content.parts[0].text.trim();
+        aiResponse = aiResponse.replace(/```json/g, "").replace(/```/g, "").trim();
+
+        console.log("✅ AI Message (Cleaned JSON):", aiResponse);
+
+        return JSON.parse(aiResponse);
+    } catch (error) {
+        hideLoadingPopup();
+        console.error("❌ Gemini API Error:", error);
+        alert(`Failed to connect to AI: ${error.message}`);
+        return null;
+    }
+}
+
+
+
+
+
+ // Function to display worksheet and show download button
+ function displayWorksheet(questions, topic, ageGroup) {
+        const container = document.getElementById("worksheet-display");
+
+        setTimeout(() => {
+            if (typeof questions === "string") {
+                try {
+                    questions = JSON.parse(questions); // Convert string to JSON if needed
+                } catch (error) {
+                    console.error("❌ Failed to parse AI response as JSON:", error);
+                    alert("Invalid worksheet data received.");
+                    container.innerHTML = ""; // Remove loading message
+                    return;
+                }
+            }
+
+            if (!questions || !Array.isArray(questions.data)) {
+                console.error("❌ AI response format is incorrect:", questions);
+                alert("Error: AI response format is incorrect.");
+                container.innerHTML = ""; // Remove loading message
+                return;
+            }
+
+            // Remove loading message
+            container.innerHTML = "";
+
+            // Create and display the download button
+            const downloadBtn = document.createElement("button");
+            downloadBtn.className = "btn btn-primary mt-2";
+            downloadBtn.innerText = `Download Worksheet: ${topic} (${ageGroup} Years)`;
+            downloadBtn.onclick = function () {
+                downloadWorksheetPDF(questions.data, topic, ageGroup);
+            };
+
+            // Create and display the view button
+            const viewBtn = document.createElement("button");
+            viewBtn.className = "btn btn-secondary mt-2 ms-3";
+            viewBtn.innerText = `View Worksheet: ${topic} (${ageGroup} Years)`;
+            viewBtn.onclick = function () {
+                toggleViewWorksheetPDF(questions.data, topic, ageGroup);
+            };
+
+            container.appendChild(downloadBtn);
+            container.appendChild(viewBtn);
+        }, 2000);
+    }
+
+
+    async function downloadWorksheetPDF(questions, topic, ageGroup) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const userId = await getUserId(); // Get user ID
+    
+        // Add title
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text(`Worksheet of ${topic} for ${ageGroup} Years`, 10, 10);
+    
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        let yOffset = 30;
+    
+        questions.forEach((q, index) => {
+            doc.text(`${index + 1}. ${q}`, 10, yOffset);
+            yOffset += 10;
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 10;
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 15;
+        });
+    
+        // ✅ Convert PDF to Blob
+        const pdfBlob = doc.output("blob");
+        const fileName = `User_${userId}_${topic.replace(/\s+/g, '_')}.pdf`; // 🔥 Updated format
+
+    
+        // ✅ Convert PDF to Base64 (for logging & Azure upload)
+        const reader = new FileReader();
+        reader.readAsDataURL(pdfBlob);
+        reader.onloadend = function () {
+            const pdfBase64 = reader.result;
+    
+            // 🔹 Log the download activity (Prevents duplicate logging)
+            if (!sessionStorage.getItem(`logged-${topic}-${ageGroup}`)) {
+                fetch("/log_activity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user: localStorage.getItem("currentUser") || "Guest",
+                        action: "Downloaded Worksheet",
+                        resource_type: "Worksheet",
+                        resource_name: `${topic} (${ageGroup} Years)`,
+                        date: new Date().toLocaleString(),
+                        source: "AI Generated",
+                        pdf: pdfBase64
+                    })
+                }).then(() => {
+                    sessionStorage.setItem(`logged-${topic}-${ageGroup}`, "true"); // Prevent duplicate logging
+                    renderPdfActivityLog(); // Update UI
+                });
+            }
+    
+            // ✅ Upload to Azure & Save Locally
+            handleGeneratedPDF(pdfBlob, fileName, "worksheet");
+    
+            // ✅ Automatically Download the PDF
+            doc.save(fileName);
+        };
+    }
+    
+
+    // Function to toggle between displaying and hiding the worksheet PDF inline with scrollable overflow
+    function toggleViewWorksheetPDF(questions, topic, ageGroup) {
+        const container = document.getElementById("pdf-viewer-container");
+        const canvas = document.getElementById("pdf-canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Check if the container is already displayed
+        if (container.style.display === "block") {
+            container.style.display = "none"; // Hide the PDF container if it's already visible
+            return;
+        }
+
+        // Show the PDF viewer container if it's hidden
+        container.style.display = "block";
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Add title
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text(`Worksheet of ${topic} for ${ageGroup} Years`, 10, 10);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+
+        let yOffset = 30;
+
+        questions.forEach((q, index) => {
+            doc.text(`${index + 1}. ${q}`, 10, yOffset);
+            yOffset += 10;
+
+            // Add space for solving (two lines)
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 10;
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 15;
+        });
+
+        // Render the PDF on a canvas using PDF.js
+        const pdfData = doc.output("arraybuffer"); // Get PDF data in arraybuffer format
+
+        const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+        loadingTask.promise.then(function (pdf) {
+            pdf.getPage(1).then(function (page) {
+                const viewport = page.getViewport({ scale: 1.5 });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            });
+        }).catch(function (error) {
+            console.error("Error rendering PDF:", error);
+            alert("Failed to render PDF.");
+        });
+    }
+
+
+
+
+
+
+
+    </script>
+
+<script>
+    function savePdfData(action, topic, ageGroup, pdfBlob, sourceType = "AI Generated") {
+    const user = localStorage.getItem("currentUser") || "Guest"; 
+
+    const reader = new FileReader();
+    reader.readAsDataURL(pdfBlob);
+    reader.onloadend = function () {
+        const pdfBase64 = reader.result;
+
+        const newEntry = {
+            user: user,
+            action: action,
+            resource_type: "Worksheet",
+            resource_name: `${topic} (${ageGroup} Years)`,
+            date: new Date().toLocaleString(),
+            source: sourceType,
+            pdf: pdfBase64
+        };
+
+        fetch("/log_activity", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newEntry)
+        });
+
+        displayPdfInChatbot(pdfBase64);
+    };
+}
+
+
+
+    function toggleViewWorksheetPDF(questions, topic, ageGroup) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text(`Worksheet of ${topic} for ${ageGroup} Years`, 10, 10);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        let yOffset = 30;
+
+        questions.forEach((q, index) => {
+            doc.text(`${index + 1}. ${q}`, 10, yOffset);
+            yOffset += 10;
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 10;
+            doc.line(10, yOffset, 200, yOffset);
+            yOffset += 15;
+        });
+
+        const pdfBlob = doc.output("blob");
+        savePdfData("Viewed Worksheet", topic, ageGroup, pdfBlob);
+    }
+
+    function displayPdfInChatbot(pdfBase64) {
+        const pdfViewer = document.getElementById("pdf-viewer-container");
+        pdfViewer.innerHTML = `<iframe src="${pdfBase64}" width="100%" height="500px"></iframe>`;
+        pdfViewer.style.display = "block";
+    }
+
+    
+</script>
+
+
+
+
+
+
+
+<script>
+    let currentFilter = "user"; // Default: My Activity
+    let currentPage = { user: 1, all: 1 }; // Track pagination for each filter
+    const itemsPerPage = 7; // Display 7 entries per page
+
+    async function fetchFilteredActivityLogs(filter = "user", page = 1) {
+        currentFilter = filter;
+        currentPage[filter] = page;
+
+        const pdfLogBody = document.getElementById("pdf-log-body");
+        const paginationContainer = document.getElementById("pagination-controls");
+
+        console.log(`Fetching ${filter} logs for page ${page}`);
+
+        pdfLogBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
+        paginationContainer.innerHTML = ""; // Clear previous pagination
+
+        try {
+            const response = await fetch(`/get_activity_logs?filter=${filter}&page=${page}&per_page=${itemsPerPage}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            let data = await response.json();
+            console.log("Fetched data:", data);
+
+            pdfLogBody.innerHTML = ""; // Clear the table before inserting new data
+
+            if (!data.activities || data.activities.length === 0) {
+                pdfLogBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No activity found.</td></tr>`;
+                return;
+            }
+
+            data.activities.forEach(log => {
+                const logRow = document.createElement("tr");
+                logRow.innerHTML = `
+                    <td>${log.user}</td>
+                    <td>${log.action}</td>
+                    <td>${log.resource_type} - ${log.resource_name}</td>
+                    <td>${log.date}</td>
+                    <td>${log.source}</td>
+                    <td style="white-space: nowrap; text-align: center; padding: 8px;">
+                        <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <button class="btn btn-primary btn-sm" onclick="viewPdf('${log.pdf}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                          
+                        </div>
+                         <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                          <a href="${log.pdf}" download="${log.resource_name.replace(/\s+/g, '_')}.pdf" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-download"></i> Download
+                            </a>  </div>
+                    </td>
+                `;
+                pdfLogBody.appendChild(logRow);
+            });
+
+            renderPaginationControls(data.total_pages, data.current_page, currentFilter);
+            updateActiveButton(filter);
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+            pdfLogBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Failed to load activity.</td></tr>`;
+        }
+    }
+
+    function renderPaginationControls(totalPages, currentPage, filter) {
+        const paginationContainer = document.getElementById("pagination-controls");
+        paginationContainer.innerHTML = "";
+
+        if (totalPages <= 1) return; // Hide pagination if only 1 page exists
+
+        let paginationHTML = `<div class="pagination-container">`;
+
+        if (currentPage > 1) {
+            paginationHTML += `<button class="btn btn-outline-secondary mx-1" onclick="fetchFilteredActivityLogs('${filter}', ${currentPage - 1})">
+                <i class="fas fa-chevron-left"></i> Prev
+            </button>`;
+        }
+
+        // Display first page, "..." if needed
+        if (currentPage > 2) {
+            paginationHTML += `<button class="btn btn-outline-primary mx-1" onclick="fetchFilteredActivityLogs('${filter}', 1)">1</button>`;
+            if (currentPage > 3) {
+                paginationHTML += `<span class="mx-2">...</span>`;
+            }
+        }
+
+        // Show current page, one before, and one after
+        let startPage = Math.max(1, currentPage - 1);
+        let endPage = Math.min(totalPages, currentPage + 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `<button class="btn ${i === currentPage ? "btn-primary" : "btn-outline-primary"} mx-1" 
+            onclick="fetchFilteredActivityLogs('${filter}', ${i})">${i}</button>`;
+        }
+
+        // Display "..." if needed, then last page
+        if (currentPage < totalPages - 1) {
+            if (currentPage < totalPages - 2) {
+                paginationHTML += `<span class="mx-2">...</span>`;
+            }
+            paginationHTML += `<button class="btn btn-outline-primary mx-1" onclick="fetchFilteredActivityLogs('${filter}', ${totalPages})">${totalPages}</button>`;
+        }
+
+        if (currentPage < totalPages) {
+            paginationHTML += `<button class="btn btn-outline-secondary mx-1" onclick="fetchFilteredActivityLogs('${filter}', ${currentPage + 1})">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>`;
+        }
+
+        paginationHTML += `</div>`;
+        paginationContainer.innerHTML = paginationHTML;
+    }
+
+    function updateActiveButton(filter) {
+        document.getElementById("my-activity-btn").classList.toggle("active", filter === "user");
+        document.getElementById("all-activity-btn").classList.toggle("active", filter === "all");
+    }
+
+    function viewPdf(pdfUrl) {
+    const pdfIframe = document.getElementById("pdfIframe");
+    pdfIframe.src = pdfUrl;
+
+    // Adjust height dynamically based on viewport
+    pdfIframe.style.height = window.innerHeight * 0.8 + "px";
+
+    const pdfModal = new bootstrap.Modal(document.getElementById("pdfModal"));
+    pdfModal.show();
+}
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchFilteredActivityLogs("user", 1);
+    });
+</script>
+
+
+
+
+
+
+
+
+<script>
+    let selectedQuestions = null;  // Ensure it's null initially
+
+// Attach event listeners to question selection buttons
+document.querySelectorAll("#question-buttons button").forEach(button => {
+    button.addEventListener("click", function () {
+        let value = this.getAttribute("data-value");
+
+        // Show Bootstrap modal for the premium feature
+        if (value === "15") {
+            showBootstrapAlert("Premium Feature", "🚀 Subscribe for more questions! Upgrade to premium.");
+            return;
+        }
+
+        // Select the chosen number of questions
+        selectedQuestions = value;
+        document.querySelectorAll("#question-buttons button").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+    });
+});
+
+// Function to generate worksheet
+async function generateWorksheet() {
+    let topic = selectedTopic || document.querySelector("#topic-buttons .active")?.dataset.value;
+    let ageGroup = selectedAgeGroup || document.querySelector("#age-buttons .active")?.dataset.value;
+
+    if (!topic || !ageGroup) {
+    showBootstrapAlert("Warning", "⚠️ Please select a topic and an age group before proceeding.");
+    return;
+}
+
+
+if (!selectedQuestions) {
+    showBootstrapAlert("Warning", "⚠️ Please select the number of questions before generating the worksheet.");
+    return;
+}
+
+
+    logActivity("Generated Worksheet", "Worksheet", `${topic} (${ageGroup} Years, ${selectedQuestions} Questions)`);
+    clearPreviousWorksheet(); 
+
+    // Show loading message
+    const container = document.getElementById("worksheet-display");
+    container.innerHTML = `
+        <div id="loading-message" class="text-center mt-3">
+            <h4>Generating content...</h4>
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+
+    await new Promise(resolve => setTimeout(resolve, 3000));  
+
+    const prompt = `Generate a JSON object containing an array called "data" with ${selectedQuestions} elements. 
+Each element should be a string-based question for a worksheet on the topic '${topic}' for 
+${ageGroup}-year-old children. Ensure the response is valid JSON with no extra text.`;
+
+    try {
+        const worksheetData = await fetchAIResponse(prompt);
+
+        if (!worksheetData) {
+    showBootstrapAlert("Error", "AI response is empty.");
+    return;
+}
+
+
+        displayWorksheet(worksheetData, topic, ageGroup, selectedQuestions);
+    } catch (error) {
+        console.error("❌ Error fetching AI response:", error);
+        showBootstrapAlert("Error", "Failed to generate worksheet. Please try again.");
+
+        container.innerHTML = "";
+    }
+}
+
+// Function to clear previous worksheet and PDF viewer
+function clearPreviousWorksheet() {
+    let worksheetDisplay = document.getElementById("worksheet-display");
+    if (worksheetDisplay) {
+        worksheetDisplay.innerHTML = ""; 
+    }
+
+    let pdfViewer = document.getElementById("pdf-viewer-container");
+    if (pdfViewer) {
+        pdfViewer.style.display = "none"; 
+    }
+}
+    </script>
+    
+
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+// Toggle Community Submenu
+function toggleCommunity() {
+    let container = document.getElementById("community-container");
+    
+    // Toggle the Community menu visibility
+    if (container.style.display === "none" || container.style.display === "") {
+        container.style.display = "block";
+        showCommunityPopup(); // Show popup when opening Community
+    } else {
+        container.style.display = "none";
+    }
+}
+
+// Load Content Pages (Same as Sidebar Links)
+function loadContent(pageId) {
+    let allPages = document.querySelectorAll('.content-page');
+
+    // Hide all pages
+    allPages.forEach(page => page.style.display = "none");
+
+    // Show the selected page
+    document.getElementById(pageId).style.display = "block";
+}
+
+
+</script>
+
+
+
+
+<script>
+    // Pre-defined PDF URLs for each topic and age group combination
+    const pdfUrls = {
+        "Synthetic Phonics": {
+            "2-4": "/static/images/Synpdf.pdf",
+            "4-5": "/static/images/Jolly_Phonics_2-4_Years.pdf",
+            "5-10": "path/to/synthetic_phonics_5_10.pdf"
+        },
+        "Systematic Synthetic Approach": {
+            "2-4": "/static/images/Blending_Segmenting_5-7_Years.pdf",
+            "4-5": "path/to/systematic_synthetic_4_5.pdf",
+            "5-10": "path/to/systematic_synthetic_5_10.pdf"
+        },
+        "Fundamental Phonics Rules": {
+            "2-4": "path/to/fundamental_phonics_2_4.pdf",
+            "4-5": "path/to/fundamental_phonics_4_5.pdf",
+            "5-10": "path/to/fundamental_phonics_5_10.pdf"
+        },
+        // Add more topics with their respective PDFs
+    };
+
+    // Initialize variables to store selected topic and age group
+    let selectedTopic = '';
+    let selectedAgeGroup = '';
+
+// Event listener for topic button selection
+document.getElementById('topic-buttons').addEventListener('click', function(event) {
+    if (event.target.tagName === 'BUTTON') {
+        // Deselect other buttons
+        Array.from(event.currentTarget.children).forEach(button => button.classList.remove('active'));
+        // Mark this button as selected
+        event.target.classList.add('active');
+        
+        // Clear previous worksheet and PDF viewer
+        clearPreviousWorksheet();
+
+        selectedTopic = event.target.getAttribute('data-value');
+    }
+});
+
+// Event listener for age group button selection
+document.getElementById('age-buttons').addEventListener('click', function(event) {
+    if (event.target.tagName === 'BUTTON') {
+        // Deselect other buttons
+        Array.from(event.currentTarget.children).forEach(button => button.classList.remove('active'));
+        // Mark this button as selected
+        event.target.classList.add('active');
+        
+        // Clear previous worksheet and PDF viewer
+        clearPreviousWorksheet();
+
+        selectedAgeGroup = event.target.getAttribute('data-value');
+    }
+});
+
+
+    // Event listener to show more topics
+    document.getElementById('show-more-topics').addEventListener('click', function() {
+        const extraTopics = document.getElementById('extra-topics');
+        extraTopics.style.display = extraTopics.style.display === 'none' ? 'block' : 'none';
+        this.textContent = extraTopics.style.display === 'block' ? '- Less' : '+ More';
+    });
+
+    // Event listener to show more age groups
+    document.getElementById('show-more-age-groups').addEventListener('click', function() {
+        const extraAgeGroups = document.getElementById('extra-age-groups');
+        extraAgeGroups.style.display = extraAgeGroups.style.display === 'none' ? 'block' : 'none';
+        this.textContent = extraAgeGroups.style.display === 'block' ? '- Less' : '+ More';
+    });
+
+    // Event listener for creating the worksheet
+    document.getElementById('create-worksheet').addEventListener('click', function() {
+        if (selectedTopic && selectedAgeGroup) {
+            // Get the PDF URL based on selected topic and age group
+            const pdfUrl = pdfUrls[selectedTopic] ? pdfUrls[selectedTopic][selectedAgeGroup] : '';
+
+            if (pdfUrl) {
+                // Display the PDF in an iframe
+                const iframe = `<iframe src="${pdfUrl}" width="100%" height="500px"></iframe>`;
+                document.getElementById('worksheet-display').innerHTML = iframe;
+
+                // Enable the download PDF button
+                document.getElementById('download-pdf').style.display = 'block';
+                
+                // Store the PDF URL for download button
+                document.getElementById('download-pdf').onclick = function() {
+                    window.location.href = pdfUrl; // Download the PDF
+                };
+            } else {
+                alert("PDF not available for this topic and age group.");
+            }
+        } else {
+            alert("Please select both a topic and an age group.");
+        }
+    });
+</script>
+
+
+
+<!-- JavaScript (for flashcard creation and flipping functionality) -->
+<script>
+    function showLoadingPopup(message) {
+        document.getElementById("loading-message").innerText = message;
+        document.getElementById("loading-popup").style.display = "flex";
+    }
+    
+    function hideLoadingPopup() {
+        document.getElementById("loading-popup").style.display = "none";
+    }
+    
+    async function generateFlashcards() {
+    let topic = document.getElementById("topic-dropdown1").value;
+    let ageGroup = document.getElementById("age-dropdown1").value;
+
+    if (!topic || !ageGroup) {
+        alert("Please select a topic and an age group.");
+        return;
+    }
+
+    showLoadingPopup("Generating Flashcards...");
+    logActivity("Generated Flashcards", "Flashcard", `${topic} (${ageGroup} Years)`);
+
+    let prompt = `Generate a JSON object with an array called "flashcards". Each element should have 
+    a "question" and an "answer" for flashcards on the topic '${topic}' for ${ageGroup}-year-old children.`;
+
+    let aiResponse = await fetchAIResponse(prompt);
+
+    hideLoadingPopup();
+
+    if (!aiResponse || !aiResponse.flashcards) {
+        alert("Failed to generate flashcards.");
+        return;
+    }
+
+    displayFlashcards(aiResponse.flashcards, topic, ageGroup);
+}
+
+function displayFlashcards(flashcards, topic, ageGroup) {
+    let container = document.getElementById("flashcards-display");
+    container.innerHTML = "";
+
+    flashcards.forEach(card => {
+        let flashcardDiv = document.createElement("div");
+        flashcardDiv.classList.add("flashcard");
+        flashcardDiv.innerHTML = `
+            <div class="flashcard-inner">
+                <div class="flashcard-front">${card.question}</div>
+                <div class="flashcard-back">${card.answer}</div>
+            </div>
+        `;
+
+        flashcardDiv.addEventListener("click", () => {
+            flashcardDiv.classList.toggle("flip");
+        });
+
+        container.appendChild(flashcardDiv);
+    });
+
+    // ✅ Show the "Download Flashcards" button properly
+    let downloadBtn = document.getElementById("downloadFlashcardBtn");
+    if (downloadBtn) {
+        downloadBtn.style.display = "block";  // Ensure button is visible
+    }
+
+
+
+    // ✅ Attach event listener to ensure it calls the right function
+    downloadBtn.onclick = function () {
+        console.log("Download Flashcards button clicked!"); // Debugging Log
+        downloadFlashcardPDF(topic, ageGroup, flashcards);
+    };
+
+    // ✅ Save and auto-download the flashcard PDF
+    saveFlashcardData("Generated Flashcard", topic, ageGroup, flashcards);
+}
+
+document.getElementById('start-flashcards').addEventListener('click', function() {
+    const topic = document.getElementById('topic-dropdown1').value;
+    const ageGroup = document.getElementById('age-dropdown1').value;
+
+    if (!topic || !ageGroup) {
+        alert("Please select a topic and an age group.");
+        return;
+    }
+
+    // ✅ Get flashcards data
+    const flashcards = getFlashcardsData(topic, ageGroup);
+    
+    // ✅ Display flashcards properly
+    displayFlashcards(flashcards, topic, ageGroup);
+});
+
+
+
+function saveFlashcardData(action, topic, ageGroup, flashcards) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.text(`Flashcards: ${topic} (${ageGroup} Years)`, 10, 10);
+    let yOffset = 20;
+
+    flashcards.forEach((card, index) => {
+        doc.text(`${index + 1}. ${card.question}`, 10, yOffset);
+        yOffset += 15;
+        doc.text(`Answer: ${card.answer}`, 10, yOffset);
+        yOffset += 20; // Increased space between question and answer
+    });
+
+    const pdfBlob = doc.output("blob");
+
+    const reader = new FileReader();
+    reader.readAsDataURL(pdfBlob);
+    reader.onloadend = function () {
+        const pdfBase64 = reader.result; // ✅ Now properly assigned
+
+        // ✅ Set `data-pdf-url` attribute correctly
+        document.getElementById("downloadFlashcardBtn").setAttribute("data-pdf-url", pdfBase64);
+
+        const logEntry = {
+            user: "Guest",
+            action: action,
+            resource_type: "Flashcard",
+            resource_name: `${topic} (${ageGroup} Years)`,
+            date: new Date().toLocaleString(),
+            source: "AI Generated",
+            pdf: pdfBase64
+        };
+
+        fetch("/log_activity", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(logEntry)
+        }).then(response => response.json()).then(() => {
+            renderPdfActivityLog();
+        }).catch(error => console.error("Error saving flashcard log:", error));
+    };
+}
+
+function downloadFlashcards() {
+    let topic = document.getElementById("topic-dropdown1").value;
+    let ageGroup = document.getElementById("age-dropdown1").value;
+
+    logActivity("Downloaded Flashcards", "Flashcard", `${topic} (${ageGroup} Years)`);
+}
+
+document.getElementById("downloadFlashcardBtn").setAttribute("data-pdf-url", pdfBase64);
+
+
+
+
+
+async function downloadFlashcardPDF(topic, ageGroup, flashcards) {
+    console.log("Generating Flashcard PDF..."); // Debugging log
+
+    if (!topic || !ageGroup) {
+        alert("Please select a topic and an age group.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const userId = await getUserId();
+
+    // Add title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(`Flashcards for ${topic} (${ageGroup} Years)`, 10, 10);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    let yOffset = 30;
+
+    flashcards.forEach((card, index) => {
+        doc.text(`${index + 1}. ${card.question}`, 10, yOffset);
+        yOffset += 10;
+        doc.text(`Answer: ${card.answer}`, 10, yOffset);
+        yOffset += 15;
+        doc.line(10, yOffset, 200, yOffset);
+        yOffset += 10;
+    });
+
+    // ✅ Convert PDF to Blob
+    const pdfBlob = doc.output("blob");
+    const fileName = `User_${userId}_${topic.replace(/\s+/g, '_')}.pdf`;
+
+    // ✅ Upload to Azure & Save Locally (Same as Worksheets)
+    console.log(`Uploading ${fileName} to Azure...`); // Debugging Log
+    handleGeneratedPDF(pdfBlob, fileName, "flashcard"); // 🔥 Upload to Azure & Save Locally
+}
+
+
+    
+document.getElementById('start-flashcards').addEventListener('click', function() {
+    const topic = document.getElementById('topic-dropdown1').value;
+    const ageGroup = document.getElementById('age-dropdown1').value;
+
+    if (!topic || !ageGroup) {
+        alert("Please select a topic and an age group.");
+        return;
+    }
+
+    // Sample flashcards data for each topic and age group
+    const flashcards = getFlashcardsData(topic, ageGroup);
+
+    // Clear the container before adding new flashcards
+    const flashcardContainer = document.getElementById('flashcard-container');
+    flashcardContainer.innerHTML = '';
+
+    // Show flashcards dynamically
+    flashcards.forEach(card => {
+        const flashcard = createFlashcard(card.question, card.answer);
+        flashcardContainer.appendChild(flashcard);
+    });
+});
+
+    
+    function getFlashcardsData(topic, ageGroup) {
+        // Sample flashcards data based on topic and age group
+        const flashcards = {
+            'Synthetic Phonics': {
+                '2-4': [
+                    { question: "What sound does 'a' make?", answer: "Ah" },
+                    { question: "What sound does 'b' make?", answer: "Buh" },
+                ],
+                '4-5': [
+                    { question: "What sound does 'c' make?", answer: "Cuh" },
+                    { question: "What sound does 'd' make?", answer: "Duh" },
+                ],
+                '5-10': [
+                    { question: "What is the sound for 'ch'?", answer: "Chuh" },
+                    { question: "What is the sound for 'sh'?", answer: "Shh" },
+                ]
+            },
+            'Systematic Synthetic Approach': {
+                '2-4': [
+                    { question: "What is the first sound of 'cat'?", answer: "Cuh" },
+                    { question: "What is the first sound of 'dog'?", answer: "Duh" },
+                ],
+                '4-5': [
+                    { question: "What is the first sound of 'mat'?", answer: "Mmm" },
+                    { question: "What is the first sound of 'bat'?", answer: "Buh" },
+                ],
+                '5-10': [
+                    { question: "What is the sound for 'ph'?", answer: "Fuh" },
+                    { question: "What is the sound for 'ou'?", answer: "Ow" },
+                ]
+            },
+            'Fundamental Phonics Rules': {
+                '2-4': [
+                    { question: "What is the sound for 's'?", answer: "Sss" },
+                    { question: "What is the sound for 't'?", answer: "Tuh" },
+                ],
+                '4-5': [
+                    { question: "What is the sound for 'm'?", answer: "Mmm" },
+                    { question: "What is the sound for 'n'?", answer: "Nuh" },
+                ],
+                '5-10': [
+                    { question: "What is the sound for 'ar'?", answer: "Arh" },
+                    { question: "What is the sound for 'er'?", answer: "Er" },
+                ]
+            }
+        };
+    
+        return flashcards[topic][ageGroup] || [];
+    }
+    
+    function createFlashcard(question, answer) {
+        const flashcard = document.createElement('div');
+        flashcard.classList.add('flashcard');
+        flashcard.innerHTML = `
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <div>${question}</div>
+                </div>
+                <div class="flashcard-back">
+                    <div>${answer}</div>
+                </div>
+            </div>
+        `;
+        
+        flashcard.addEventListener('click', function() {
+            flashcard.classList.toggle('flipped');
+        });
+    
+        return flashcard;
+    }
+    </script>
+
+<script>
+    // Logout function
+    function logoutUser() {
+        fetch('/logout', { method: 'GET' })  // Calls Flask logout route
+        .then(response => {
+            window.location.href = "/";  // Redirect to homepage after logout
+        });
+    }
+
+    // Sample predefined events
+    let events = [
+        {
+            date: '2025-02-10',
+            title: 'Event 1',
+            dateTime: '2025-02-10 10:00 AM',
+            link: 'https://example.com/event1',
+            payment: '$20',
+            type: 'danger'
+        },
+        {
+            date: '2025-02-12',
+            title: 'Event 2',
+            dateTime: '2025-02-12 3:00 PM',
+            link: 'https://example.com/event2',
+            payment: 'Free',
+            type: 'success'
+        },
+        {
+            date: '2025-02-15',
+            title: 'Event 3',
+            dateTime: '2025-02-15 5:00 PM',
+            link: 'https://example.com/event3',
+            payment: '$15',
+            type: 'primary'
+        }
+    ];
+
+    let currentMonth = new Date().getMonth();  // Current month (0-11)
+    let currentYear = new Date().getFullYear(); // Current year (e.g. 2025)
+
+    // Month names array
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Fetch batches from the database and sync to calendar
+    async function fetchBatchesForCalendar() {
+        try {
+            let response = await fetch("/get_batches");
+            let fetchedBatches = await response.json();
+            localStorage.setItem("syncBatches", JSON.stringify(fetchedBatches));
+
+            // Convert batch events into calendar format
+            let batchEvents = fetchedBatches.flatMap(batch => {
+                let startDate = new Date(batch.start_date);
+                let endDate = new Date(batch.end_date);
+                let batchDays = [];
+
+                while (startDate <= endDate) {
+                    let dateStr = startDate.toISOString().split("T")[0]; // Format YYYY-MM-DD
+                    batchDays.push({
+                        date: dateStr,
+                        title: batch.name,
+                        dateTime: `${batch.start_date} to ${batch.end_date}`,
+                        link: 'https://meet.google.com/kxh-cxmi-gfs',
+                        payment: 'Free',
+                        type: 'info'
+                    });
+                    startDate.setDate(startDate.getDate() + 1);
+                }
+
+                return batchDays;
+            });
+
+            // Merge with existing events and refresh calendar
+            events = [...events, ...batchEvents];
+            generateCalendar();
+        } catch (error) {
+            console.error("Error fetching batches for calendar:", error);
+        }
+    }
+
+    // Function to generate the calendar for the given month and year
+    function generateCalendar() {
+        const calendarGrid = document.getElementById('calendar-grid');
+        const monthYearDisplay = document.getElementById('calendar-month-year');
+
+        monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+        calendarGrid.innerHTML = '';
+
+        // Load batch events from localStorage
+        let storedBatches = JSON.parse(localStorage.getItem("syncBatches")) || [];
+        let allEvents = [...events, ...storedBatches.flatMap(batch => {
+            let startDate = new Date(batch.start_date);
+            let endDate = new Date(batch.end_date);
+            let batchDays = [];
+
+            while (startDate <= endDate) {
+                let dateStr = startDate.toISOString().split("T")[0]; // Format YYYY-MM-DD
+                batchDays.push({
+                    date: dateStr,
+                    title: batch.name,
+                    dateTime: `${batch.start_date} to ${batch.end_date}`,
+                    type: 'info'
+                });
+                startDate.setDate(startDate.getDate() + 1);
+            }
+
+            return batchDays;
+        })];
+
+        // Add empty cells before the first day of the month
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            calendarGrid.innerHTML += `<div class="calendar-day empty"></div>`;
+        }
+
+        // Add the days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateString = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            const event = allEvents.find(event => event.date === dateString);
+
+            let eventClass = event ? `has-event ${event.type}` : '';
+
+            if (event) {
+                calendarGrid.innerHTML += `<div class="calendar-day ${eventClass}" onclick="showEventDetails('${event.title}', '${event.dateTime}')">${day}</div>`;
+            } else {
+                calendarGrid.innerHTML += `<div class="calendar-day">${day}</div>`;
+            }
+        }
+    }
+
+    // Load batches from storage and fetch latest from backend
+    document.addEventListener("DOMContentLoaded", function () {
+        if (localStorage.getItem("syncBatches")) {
+            generateCalendar();
+        }
+        fetchBatchesForCalendar();
+    });
+
+    // Function to navigate between months
+    function changeMonth(direction) {
+        currentMonth += direction;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        } else if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar();
+    }
+
+    function showEventDetails(eventTitle, dateTime) {
+        document.getElementById('event-title').innerText = eventTitle;
+        document.getElementById('event-date-time').innerText = dateTime;
+        document.getElementById('event-popup').style.display = 'flex';
+    }
+
+    // Close the event pop-up
+    function closePopup() {
+        document.getElementById('event-popup').style.display = 'none';
+    }
+
+    // Initialize the calendar
+    generateCalendar();
+</script>
+
+
+</script>
+
+
+<script>function logActivity(action, resourceType, resourceName, sourceType = "AI Generated") {
+    const logData = {
+        action: action,
+        resource_type: resourceType, // 'Worksheet' or 'Flashcard'
+        resource_name: resourceName,
+        source: sourceType
+    };
+
+    fetch("/log_activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(logData)
+    });
+}
+</script>
+
+
+
+<script>// Global Chart Instances
+    let resourceChart = null;
+let isWeeklyView = true;
+let weeklyData = [];
+let dailyData = {};
+
+
+
+async function loadUserStats() {
+    try {
+        let response = await fetch('/get_user_stats');
+        let data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        // ✅ Update Logged-In User's Download Stats
+        document.getElementById('worksheets-downloaded').innerText = data.total_worksheets;
+        document.getElementById('flashcards-downloaded').innerText = data.total_flashcards;
+        document.getElementById('most-downloaded').innerText = data.most_downloaded;
+
+        // ✅ Store weekly and daily data for charts
+        weeklyData = data.weekly_data;
+        dailyData = data.daily_entries;
+
+        renderWeeklyChart();
+
+    } catch (error) {
+        console.error("Error loading user stats:", error);
+    }
+}
+
+
+
+function renderWeeklyChart() {
+    isWeeklyView = true;
+    destroyChart(resourceChart);
+
+    let ctx = document.getElementById('resource-downloads-chart').getContext('2d');
+    let labels = weeklyData.map(entry => entry.date);
+    let worksheetCounts = weeklyData.map(entry => entry.worksheets);
+    let flashcardCounts = weeklyData.map(entry => entry.flashcards);
+
+    resourceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Worksheets',
+                    data: worksheetCounts,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true
+                },
+                {
+                    label: 'Flashcards',
+                    data: flashcardCounts,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    let clickedIndex = elements[0].index;
+                    let selectedDate = labels[clickedIndex];
+                    renderDailyChart(selectedDate);
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Date (Weekly View)' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Total Entries' } }
+            }
+        }
+    });
+
+    // HIDE the "Back to Weekly View" button when in weekly view
+    document.getElementById("back-to-weekly").style.display = "none";
+}
+
+
+
+function renderDailyChart(selectedDate) {
+    isWeeklyView = false;
+    destroyChart(resourceChart);
+
+    let ctx = document.getElementById('resource-downloads-chart').getContext('2d');
+    let entries = dailyData[selectedDate] || [];
+    let labels = entries.map(entry => entry.time);
+    let counts = new Array(labels.length).fill(1);
+
+    resourceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `Entries on ${selectedDate}`,
+                data: counts,
+                borderColor: '#17a2b8',
+                backgroundColor: 'rgba(23, 162, 184, 0.2)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: () => renderWeeklyChart(),
+            scales: {
+                x: { title: { display: true, text: 'Time (Daily View)' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Entries' } }
+            }
+        }
+    });
+
+    // SHOW the "Back to Weekly View" button
+    document.getElementById("back-to-weekly").style.display = "block";
+}
+
+
+
+// Destroy previous chart instance before rendering a new one
+function destroyChart(chart) {
+    if (chart) {
+        chart.destroy();
+    }
+}
+
+// Load user stats & charts when the page loads
+document.addEventListener("DOMContentLoaded", loadUserStats);
+
+    
+</script>
+
+
+
+
+<script>
+   
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchUserProfile();
+        fetchNotifications();
+    
+        document.getElementById("notification-bell").addEventListener("click", function() {
+            fetchNotifications(true); // Mark notifications as read when the bell is clicked
+            new bootstrap.Modal(document.getElementById("notifications-modal")).show();
+        });
+    });
+    
+    // Fetch and display notifications
+    async function fetchNotifications(markAsRead = false) {
+        try {
+            let response = await fetch('/get_notifications');
+            let data = await response.json();
+    
+            let notificationList = document.getElementById("notifications-list");
+            notificationList.innerHTML = ""; // Clear previous notifications
+    
+            if (data.notifications.length === 0) {
+                notificationList.innerHTML = '<li class="list-group-item">No new notifications</li>';
+            } else {
+                data.notifications.forEach(notif => {
+                    let item = document.createElement("li");
+                    item.classList.add("list-group-item");
+                    item.innerText = notif.message; // Only display the message
+                    notificationList.appendChild(item);
+                });
+    
+                // Update notification count
+                let countBadge = document.getElementById("notification-count");
+                if (data.unread_count > 0) {
+                    countBadge.innerText = data.unread_count;
+                    countBadge.style.display = "inline-block";
+                } else {
+                    countBadge.style.display = "none";
+                }
+            }
+    
+            // Mark notifications as read if bell is clicked
+            if (markAsRead) {
+                await fetch('/mark_notifications_read', { method: 'POST' });
+                document.getElementById("notification-count").style.display = "none";
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    }
+    
+    // Automatically check for new notifications every 30 seconds
+    setInterval(fetchNotifications, 30000);
+
+
+    function showSettingsButton() {
+    let btn = document.getElementById("floating-settings-btn");
+    btn.style.display = "block";
+    setTimeout(() => { btn.style.opacity = "1"; }, 100);
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => { btn.style.display = "none"; }, 5000);
+}
+
+
+function navigateToSettings() {
+    let btn = document.getElementById("floating-settings-btn");
+    btn.style.display = "none"; // Hide the button after clicking
+    loadContent('settings'); // Load settings section
+    document.getElementById('settings').scrollIntoView({ behavior: 'smooth' }); // Smooth scroll
+}
+
+
+function toggleSettingsButton() {
+    let settingsBtn = document.getElementById("floating-settings-btn");
+    settingsBtn.style.display = settingsBtn.style.display === "block" ? "none" : "block";
+}
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        async function getUserId() {
+            try {
+                let response = await fetch('/get_user_id');
+                let data = await response.json();
+                if (data.error) throw new Error(data.error);
+                return data.user_id; // ✅ Use user_id from the new API
+            } catch (error) {
+                console.error("Error fetching user ID:", error);
+                return "Guest"; // Default user ID
+            }
+        }
+        
+        
+
+    </script>
+    <script>
+        async function uploadToAzureAndDownload(pdfBlob, fileName, type) {
+            const formData = new FormData();
+            formData.append("file", pdfBlob, fileName);
+            formData.append("type", type); // "worksheet" or "flashcard"
+        
+            try {
+                let response = await fetch("/upload_blob", {
+                    method: "POST",
+                    body: formData
+                });
+                let result = await response.json();
+        
+                if (result.success) {
+                    alert(`${type} uploaded successfully to Azure!`);
+                    saveToLocalAndDownload(pdfBlob, fileName, type); // Save locally and download
+                } else {
+                    alert("Upload to Azure failed: " + result.error);
+                }
+            } catch (error) {
+                console.error("Upload error:", error);
+            }
+        }
+        
+        // 🔹 Save PDF locally & Download
+        function saveToLocalAndDownload(pdfBlob, fileName, type) {
+            const reader = new FileReader();
+            reader.readAsDataURL(pdfBlob);
+            reader.onload = function () {
+                let files = JSON.parse(localStorage.getItem(type + "-files")) || [];
+                files.push({ name: fileName, data: reader.result });
+                localStorage.setItem(type + "-files", JSON.stringify(files));
+        
+                // Trigger file download
+                const downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(pdfBlob);
+                downloadLink.download = fileName;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+        
+                alert(`${type} saved locally and downloaded!`);
+                displayLocalFiles(type); // Refresh UI
+            };
+        }
+        
+        
+        
+        
+    </script>
+
+    
+    <script>
+        async function handleGeneratedPDF(pdfBlob, fileName, type) {
+            const formData = new FormData();
+            formData.append("file", pdfBlob, fileName);
+            formData.append("type", type); // "worksheet" or "flashcard"
+        
+            try {
+                let response = await fetch("/upload_blob", {
+                    method: "POST",
+                    body: formData
+                });
+        
+                let result = await response.json();
+                if (result.success) {
+                    console.log(`${fileName} uploaded to Azure successfully.`); // ✅ Silent logging
+                    saveToLocalStorage(pdfBlob, fileName, type); // Save locally
+                } else {
+                    console.error(`Upload failed: ${result.error}`);
+                }
+            } catch (error) {
+                console.error("Upload error:", error);
+            }
+        }
+        
+        
+        // ✅ Function to Save Locally (Silent)
+        function saveToLocalStorage(pdfBlob, fileName, type) {
+            const reader = new FileReader();
+            reader.readAsDataURL(pdfBlob);
+            reader.onload = function () {
+                let files = JSON.parse(localStorage.getItem(type + "-files")) || [];
+                files.push({ name: fileName, data: reader.result });
+                localStorage.setItem(type + "-files", JSON.stringify(files));
+        
+                console.log(`${fileName} saved locally.`); // ✅ Silent logging
+                displayLocalFiles(type);
+            };
+        }
+        
+        
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let downloadBtn = document.getElementById("downloadFlashcardBtn");
+        
+            if (downloadBtn) {
+                downloadBtn.addEventListener("click", function () {
+                    console.log("Download Flashcards button clicked!"); // Debugging Log
+        
+                    const topic = document.getElementById("topic-dropdown1").value;
+                    const ageGroup = document.getElementById("age-dropdown1").value;
+        
+                    if (!topic || !ageGroup) {
+                        alert("Please select a topic and an age group.");
+                        return;
+                    }
+        
+                    let flashcards = [];
+                    document.querySelectorAll(".flashcard-front").forEach((front, index) => {
+                        let answer = document.querySelectorAll(".flashcard-back")[index].innerText;
+                        flashcards.push({ question: front.innerText, answer: answer });
+                    });
+        
+                    if (flashcards.length === 0) {
+                        alert("No flashcards available to download. Generate flashcards first.");
+                        return;
+                    }
+        
+                    // ✅ Generate PDF and Download Locally
+                    generateFlashcardsPDF(topic, ageGroup, flashcards);
+                });
+            } else {
+                console.error("❌ Error: downloadFlashcardBtn not found in DOM!");
+            }
+        });
+        
+        function generateFlashcardsPDF(topic, ageGroup, flashcards) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+        
+            // Add title
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text(`Flashcards for ${topic} (${ageGroup} Years)`, 10, 10);
+        
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            let yOffset = 30;
+        
+            flashcards.forEach((card, index) => {
+                doc.text(`${index + 1}. ${card.question}`, 10, yOffset);
+                yOffset += 10;
+                doc.text(`Answer: ${card.answer}`, 10, yOffset);
+                yOffset += 15;
+                doc.line(10, yOffset, 200, yOffset);
+                yOffset += 10;
+            });
+        
+            // ✅ Download Locally
+            const fileName = `Flashcards_${topic}_${ageGroup}.pdf`;
+            doc.save(fileName);
+            console.log(`✅ ${fileName} downloaded successfully!`);
+        }
+        
+    </script>
+    
+
+<script>async function searchActivity() {
+    let query = document.getElementById("search-input").value.trim().toLowerCase();
+    if (!query) {
+        fetchFilteredActivityLogs(currentFilter, 1); // Reset to default if empty
+        return;
+    }
+
+    let url = `/get_activity_logs?filter=${currentFilter}&search=${query}&page=1&per_page=${itemsPerPage}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        updateTableWithData(data);
+    } catch (error) {
+        console.error("Error searching activity:", error);
+    }
+}
+
+async function filterActivity(type) {
+    let resourceType = "";
+    let sortType = "latest";  // Default sorting order
+
+    if (type === "worksheets") {
+        resourceType = "worksheet";
+    } else if (type === "flashcards") {
+        resourceType = "flashcard";
+    } else if (type === "latest") {
+        sortType = "latest";
+    } else if (type === "oldest") {
+        sortType = "oldest";
+    }
+
+    let url = `/get_activity_logs?filter=${currentFilter}&resource_type=${resourceType}&type=${sortType}&page=${currentPage}&per_page=${itemsPerPage}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        updateTableWithData(data);
+    } catch (error) {
+        console.error("❌ Error filtering activity:", error);
+    }
+}
+
+
+
+function updateTableWithData(data) {
+    let tableBody = document.getElementById("pdf-log-body");
+    tableBody.innerHTML = ""; // Clear table
+
+    if (!data.activities || data.activities.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No results found.</td></tr>`;
+        return;
+    }
+
+    data.activities.forEach(log => {
+        const logRow = document.createElement("tr");
+        logRow.innerHTML = `
+            <td>${log.user}</td>
+            <td>${log.action}</td>
+            <td>${log.resource_type} - ${log.resource_name}</td>
+            <td>${log.date}</td>
+            <td>${log.source}</td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="viewPdf('${log.pdf}')">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <a href="${log.pdf}" download class="btn btn-secondary btn-sm">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </td>
+        `;
+        tableBody.appendChild(logRow);
+    });
+
+    renderPaginationControls(data.total_pages, data.current_page, currentFilter);
+}
+
+
+</script>
+
+<!-- Bootstrap Alert Modal -->
+<div id="alertModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertModalLabel">Notification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="alertModalBody">
+                <!-- Alert message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>function showBootstrapAlert(title, message) {
+    document.getElementById("alertModalLabel").innerText = title;
+    document.getElementById("alertModalBody").innerText = message;
+    let alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+    alertModal.show();
+}
+
+
+</script>
+
+<!-- Dark Background Overlay -->
+<div id="community-overlay" class="overlay"></div>
+
+<!-- Community Popup -->
+<div id="community-popup" class="community-popup">
+    <button id="close-popup" class="close-btn">&times;</button>
+    <h2><i class="fas fa-users"></i> Join Our Community!</h2>
+    <p>Connect with fellow learners and educators!</p>
+    <div id="profile-board" class="profile-board"></div>
+</div>
+
+
+
+
+
+<script>
+    function showCommunityPopup() {
+        let popup = document.getElementById("community-popup");
+        let overlay = document.getElementById("community-overlay");
+    
+        fetch('/get_all_users')
+            .then(response => response.json())
+            .then(data => {
+                let board = document.getElementById('profile-board');
+                board.innerHTML = ""; // Clear previous content
+    
+                if (!data.pictures || !data.pictures.length) return;
+    
+                data.pictures.slice(0, 6).forEach(pic => {
+                    let imgContainer = document.createElement('div');
+                    imgContainer.classList.add('profile-item');
+    
+                    let img = document.createElement('img');
+                    img.src = pic;
+                    img.classList.add('profile-img');
+    
+                    let icon = document.createElement('i');
+                    icon.classList.add('fas', 'fa-smile'); // Fun emoji
+    
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(icon);
+                    board.appendChild(imgContainer);
+                });
+    
+                // Show popup and overlay
+                overlay.classList.add('show');
+                popup.classList.add('show');
+    
+                // Hide popup automatically after 3.5 seconds
+                setTimeout(() => {
+                    closeCommunityPopup();
+                }, 3500);
+            })
+            .catch(error => console.error("❌ Error fetching profile pictures:", error));
+    }
+    
+    // Function to close the popup
+    function closeCommunityPopup() {
+        document.getElementById("community-popup").classList.remove("show");
+        document.getElementById("community-overlay").classList.remove("show");
+    }
+    
+    // Close popup when clicking the overlay (but NOT the menu)
+    document.getElementById("community-overlay").addEventListener("click", closeCommunityPopup);
+    
+    // Close popup when clicking the "X" button
+    document.getElementById('close-popup').addEventListener('click', closeCommunityPopup);
+    </script>
+    
+    
+    
+
+</body>
+</html>
+

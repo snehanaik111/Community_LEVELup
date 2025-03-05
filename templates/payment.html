@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Payment...</title>
+</head>
+<body onload="document.forms['payu_form'].submit();" style="display: none;">
+    <form name="payu_form" action="{{ payu_url }}" method="post">
+        {% for key, value in payu_data.items() %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+    </form>
+</body>
+</html>

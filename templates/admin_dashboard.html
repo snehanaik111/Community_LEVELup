@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" type="text/css" href="/static/css/admin_dash.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="/static/images/logo_trans.png" alt="Logo">
+        </div>
+        <h2>Admin</h2>
+        
+        
+        <!-- Add Font Awesome CDN for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<a href="#" onclick="loadContent('dashboard',event)" class="active">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+</a>
+<a href="#manage" onclick="loadContent('manage',event)">
+    <i class="fas fa-cogs"></i> Manage
+</a>
+<a href="#" onclick="loadContent('batches', event)">
+    <i class="fas fa-layer-group"></i> Batches
+</a>
+<a href="#" onclick="loadContent('leads',event)">
+    <i class="fas fa-users"></i> Leads
+</a>
+<a href="#" onclick="loadContent('reports',event)">
+    <i class="fas fa-chart-line"></i> Reports
+</a>
+<a href="#" onclick="loadContent('settings',event)">
+    <i class="fas fa-cogs"></i> Settings
+</a>
+
+      
+        <a href="{{ url_for('logout') }}" class="btn btn-danger logout-btn">🚪 Logout</a>
+    </div>
+
+    <!-- Sidebar toggle button -->
+    <button class="sidebar-toggler" onclick="toggleSidebar()">☰</button>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+
+        <div class="content-page" id="dashboard">
+            <h1>Dashboard</h1>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>Total Users:</h4>
+                        <p>{{total_users}}</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>Worksheets Used:</h4>
+                        <p>{{total_worksheets}}</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>Flashcards Used:</h4>
+                        <p>{{total_flashcards}}</p>
+                    </div>
+                </div>
+            </div>
+        
+            <h2 class="table-heading">Users Activity</h2>
+<button id="bulkEmailButton" class="btn btn-primary">+</button>
+<table class="user-table">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Profile</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Worksheets Used</th>
+            <th>Flashcards Used</th>
+            <th>Activity Logs</th>
+            <th>Subscription</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td><input type="checkbox" class="email-checkbox" value="{{ user.email }}"></td>
+            <td><img src="{{ user.profile_picture }}" width="40" height="40"></td>
+            <td>{{ user.name }}</td>
+            <td class="user-email">{{ user.email }}</td>
+            <td>{{ user.worksheets_used }}</td>
+            <td>{{ user.flashcards_used }}</td>
+            <td>
+                <button class="btn btn-info view-logs-btn" data-user-id="{{ user.email }}">
+                    View Logs
+                </button>
+            </td>
+            <td>{{ user.subscription }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Log Data Modal -->
+<div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logsModalLabel">User Logs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="logsList" class="list-group">
+                    <!-- Logs will be injected here -->
+                </ul>
+                <!-- Pagination Controls -->
+                <nav>
+                    <ul class="pagination justify-content-center mt-3" id="paginationControls">
+                        <!-- Pagination buttons will be generated dynamically -->
+                    </ul>
+                </nav>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Fetching Logs and Handling Modal -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".view-logs-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let userEmail = this.getAttribute("data-user-id");  // Get user email
+
+            fetch(`/get_user_activity/${userEmail}`)  // ✅ New API Call
+                .then(response => response.json())
+                .then(data => {
+                    let logsList = document.getElementById("logsList");
+                    let paginationControls = document.getElementById("paginationControls");
+
+                    logsList.innerHTML = "";
+                    paginationControls.innerHTML = "";
+
+                    const logs = data.logs || [];
+                    const entriesPerPage = 7;
+                    let currentPage = 1;
+
+                    function renderLogs(page) {
+                        logsList.innerHTML = "";
+                        let start = (page - 1) * entriesPerPage;
+                        let end = start + entriesPerPage;
+                        let paginatedLogs = logs.slice(start, end);
+
+                        if (paginatedLogs.length > 0) {
+                            paginatedLogs.forEach(log => {
+                                let listItem = document.createElement("li");
+                                listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+                                listItem.innerHTML = `<strong>${log.action} (${log.resource_type})</strong> <span class="text-muted">${log.date}</span>`;
+                                logsList.appendChild(listItem);
+                            });
+                        } else {
+                            logsList.innerHTML = "<li class='list-group-item text-muted text-center'>No logs available</li>";
+                        }
+                    }
+
+                    function renderPagination() {
+                        paginationControls.innerHTML = "";
+                        let totalPages = Math.ceil(logs.length / entriesPerPage);
+
+                        if (totalPages > 1) {
+                            for (let i = 1; i <= totalPages; i++) {
+                                let pageItem = document.createElement("li");
+                                pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+                                let pageLink = document.createElement("a");
+                                pageLink.className = "page-link";
+                                pageLink.href = "#";
+                                pageLink.textContent = i;
+                                pageLink.addEventListener("click", function (e) {
+                                    e.preventDefault();
+                                    currentPage = i;
+                                    renderLogs(currentPage);
+                                    renderPagination();
+                                });
+                                pageItem.appendChild(pageLink);
+                                paginationControls.appendChild(pageItem);
+                            }
+                        }
+                    }
+
+                    // Initialize modal with logs and pagination
+                    renderLogs(currentPage);
+                    renderPagination();
+
+                    // Show modal
+                    new bootstrap.Modal(document.getElementById("logsModal")).show();
+                })
+                .catch(error => console.error("Error fetching logs:", error));
+        });
+    });
+});
+</script>
+
+
+
+<!--Bulk email Modal -->
+<div class="modal fade" id="bulkEmailModal" tabindex="-1" aria-labelledby="bulkEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 custom-modal">
+            <div class="modal-header py-2 border-0 d-flex justify-content-center position-relative bg-light rounded-top">
+                
+                <h5 class="modal-title fw-bold text-primary mb-0"> 📧 Compose Email</h5>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body bg-light">
+                <p class="mb-3 text-secondary">
+                    <strong class="text-dark">Recipients:</strong> 
+                    <span id="selectedEmails" class="text-dark fw-normal"></span>
+
+                </p>
+                <textarea id="emailMessage" class="form-control mb-3 shadow-sm border-0" rows="5" placeholder="✨ Type your message here..."></textarea>
+            </div>
+            <div class="modal-footer bg-light d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+               
+
+                <button id="sendBulkEmail" class="btn btn-primary rounded-pill px-4 shadow-sm">🚀 Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+        
+        <script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".view-logs-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let logsData = JSON.parse(this.getAttribute("data-logs"));
+            let logsList = document.getElementById("logsList");
+            let paginationControls = document.getElementById("paginationControls");
+
+            const entriesPerPage = 7;
+            let currentPage = 1;
+            
+            function renderLogs(page) {
+                logsList.innerHTML = "";
+                let start = (page - 1) * entriesPerPage;
+                let end = start + entriesPerPage;
+                let paginatedLogs = logsData.slice(start, end);
+
+                if (paginatedLogs.length > 0) {
+                    paginatedLogs.forEach(log => {
+                        let listItem = document.createElement("li");
+                        listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+                        listItem.innerHTML = `<strong>${log.service_name}</strong> <span class="text-muted">${log.timestamp}</span>`;
+                        logsList.appendChild(listItem);
+                    });
+                } else {
+                    logsList.innerHTML = "<li class='list-group-item text-muted text-center'>No logs available</li>";
+                }
+            }
+
+            function renderPagination() {
+                paginationControls.innerHTML = "";
+                let totalPages = Math.ceil(logsData.length / entriesPerPage);
+
+                if (totalPages > 1) {
+                    for (let i = 1; i <= totalPages; i++) {
+                        let pageItem = document.createElement("li");
+                        pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+                        let pageLink = document.createElement("a");
+                        pageLink.className = "page-link";
+                        pageLink.href = "#";
+                        pageLink.textContent = i;
+                        pageLink.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            currentPage = i;
+                            renderLogs(currentPage);
+                            renderPagination();
+                        });
+                        pageItem.appendChild(pageLink);
+                        paginationControls.appendChild(pageItem);
+                    }
+                }
+            }
+
+            // Initialize modal with logs and pagination
+            renderLogs(currentPage);
+            renderPagination();
+
+            // Show modal
+            let logsModal = new bootstrap.Modal(document.getElementById("logsModal"));
+            logsModal.show();
+        });
+    });
+});
+
+
+
+
+           // Send Email Function
+function sendEmail(button) {
+    // Get the email from the same row as the clicked button
+    var row = button.closest("tr");
+    var userEmail = row.querySelector(".user-email").textContent.trim();
+
+    // SweetAlert2 popup for email confirmation
+    Swal.fire({
+        title: 'Email Sent Successfully!',
+        text: 'Email has been sent to ' + userEmail + ' to convince them to buy the paid subscription!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+        background: '#f8f9fa',
+        customClass: {
+            popup: 'swal-custom-popup'
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let modal = new bootstrap.Modal(document.getElementById("bulkEmailModal"));
+    let bulkEmailButton = document.getElementById("bulkEmailButton");
+    let sendBulkEmail = document.getElementById("sendBulkEmail");
+    let emailMessage = document.getElementById("emailMessage");
+    let selectedEmailsText = document.getElementById("selectedEmails");
+
+    // Open Bulk Email Modal
+    bulkEmailButton.addEventListener("click", function () {
+        let selectedEmails = Array.from(document.querySelectorAll(".email-checkbox:checked"))
+            .map(checkbox => checkbox.value);
+
+        if (selectedEmails.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Emails Selected',
+                text: 'Please select at least one email.',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        selectedEmailsText.textContent = selectedEmails.join(", ");
+        modal.show();  // Show Bootstrap modal
+    });
+
+    // Send Bulk Email
+    sendBulkEmail.addEventListener("click", function () {
+        let message = emailMessage.value.trim();
+        let recipients = selectedEmailsText.textContent.split(", ");
+
+        if (message === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Message Required',
+                text: 'Please enter a message before sending.',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        fetch("/send_bulk_email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ emails: recipients, message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Email Sent!',
+                text: data.message,
+                confirmButtonColor: '#3085d6'
+            });
+            modal.hide();  // Close modal on success
+        })
+        .catch(error => console.error("Error sending email:", error));
+    });
+});
+
+            
+        
+        </script>
+
+        
+      
+        <div class="content-page" id="manage" style="display:none;">
+            <h2>Manage Users</h2>
+        
+            <!-- User Search and Filters -->
+            <div class="manage-search">
+                <input type="text" id="search-users" placeholder="Search Users..." class="search-input" onkeyup="filterUsers()">
+                <select id="filter-role" class="role-filter" onchange="filterUsers()">
+                    <option value="">Filter by Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="student">Student</option>
+                    <option value="parent">Parent</option>
+                </select>
+                <button class="add-user-btn" onclick="showModal()">Add New User</button>
+            </div>
+        
+            <!-- User List Table -->
+            <table class="user-list-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list-body">
+                    <!-- User data will go here dynamically -->
+                </tbody>
+            </table>
+        
+            <!-- Modal for Adding New User -->
+            <div id="add-user-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h3>Add New User</h3>
+                    <form id="add-user-form">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required><br><br>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required><br><br>
+                        <label for="role">Role:</label>
+                        <select id="role" name="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="student">Student</option>
+                            <option value="parent">Parent</option>
+                        </select><br><br>
+                        <button type="submit">Add User</button>
+                    </form>
+                </div>
+            </div>
+<br>
+            <!-- Recent Activity Section -->
+<h3>Recent Activity</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Worksheet</th>
+            <th>Date</th>
+            <th>PDF</th>
+        </tr>
+    </thead>
+    <tbody id="pdf-log-body"></tbody>
+</table>
+
+<!-- Modal for PDF Preview -->
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pdfModalLabel">PDF Preview</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <iframe id="pdfIframe" width="100%" height="100%" style="border: none;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+
+<div id="pagination-controls" class="mt-3"></div>
+
+
+        </div>
+        
+    <script>  
+        // Sample data for dynamic user list
+        let users = [
+            { id: 1, username: "JohnDoe", email: "john@example.com", role: "Teacher", status: true },
+            { id: 2, username: "JaneSmith", email: "jane@example.com", role: "Admin", status: false },
+            { id: 3, username: "TomBrown", email: "tom@example.com", role: "Student", status: true },
+        ];
+        
+        // Function to show the user creation modal
+        function showModal() {
+            document.getElementById("add-user-modal").style.display = "block";
+        }
+        
+        // Function to hide the modal
+        function closeModal() {
+            document.getElementById("add-user-modal").style.display = "none";
+        }
+        
+        // Close modal if user clicks outside
+        window.onclick = function(event) {
+            if (event.target === document.getElementById("add-user-modal")) {
+                closeModal();
+            }
+        };
+        
+        // Function to render user list dynamically
+        function renderUserList(filteredUsers) {
+            const userListBody = document.getElementById('user-list-body');
+            userListBody.innerHTML = ''; // Clear current list
+        
+            filteredUsers.forEach(user => {
+                const userRow = document.createElement('tr');
+                userRow.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>
+                        <div class="status-toggle">
+                            <input type="checkbox" ${user.status ? 'checked' : ''} onclick="toggleStatus(${user.id}, this)">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="edit-btn" onclick="editUser(${user.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                `;
+                userListBody.appendChild(userRow);
+            });
+        }
+        
+        // Function to toggle user status
+        function toggleStatus(userId, checkbox) {
+            const user = users.find(u => u.id === userId);
+            user.status = checkbox.checked;
+        }
+        
+        // Function to delete a user
+        function deleteUser(userId) {
+            users = users.filter(u => u.id !== userId);
+            renderUserList(users);
+        }
+        
+        // Function to edit a user
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('role').value = user.role;
+            document.getElementById('add-user-modal').style.display = 'block';
+        
+            document.getElementById('add-user-form').onsubmit = function(event) {
+                event.preventDefault();
+                user.username = document.getElementById('username').value;
+                user.email = document.getElementById('email').value;
+                user.role = document.getElementById('role').value;
+                renderUserList(users);
+                closeModal();
+            };
+        }
+        
+        // Function to add a new user
+        document.getElementById('add-user-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+        
+            const newUser = {
+                id: users.length + 1,
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                role: document.getElementById('role').value,
+                status: true
+            };
+        
+            users.push(newUser);
+            renderUserList(users);
+            closeModal();
+        });
+        
+        // Modal close functionality
+        document.querySelector('.close-btn').addEventListener('click', closeModal);
+        
+        // Function to filter users
+        function filterUsers() {
+            const searchQuery = document.getElementById('search-users').value.toLowerCase();
+            const filterRole = document.getElementById('filter-role').value.toLowerCase();
+        
+            const filteredUsers = users.filter(user => {
+                const matchesSearch = user.username.toLowerCase().includes(searchQuery) || user.email.toLowerCase().includes(searchQuery);
+                const matchesRole = filterRole === "" || user.role.toLowerCase() === filterRole;
+                return matchesSearch && matchesRole;
+            });
+        
+            renderUserList(filteredUsers);
+        }
+        
+        // Initial render of the user list
+        renderUserList(users);
+</script>        
+        
+<script>
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    function getPdfActivityLog() {
+        const log = JSON.parse(localStorage.getItem("pdfActivityLog")) || [];
+        return log.reverse(); // Show latest first
+    }
+
+    function renderPdfActivityLog() {
+        const pdfLogBody = document.getElementById('pdf-log-body');
+        pdfLogBody.innerHTML = '';
+
+        const pdfActivityLog = getPdfActivityLog();
+        const totalPages = Math.ceil(pdfActivityLog.length / itemsPerPage);
+        currentPage = Math.min(currentPage, totalPages); // Adjust if needed
+
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageData = pdfActivityLog.slice(start, end);
+
+        pageData.forEach(log => {
+            const logRow = document.createElement('tr');
+            logRow.innerHTML = `
+                <td>${log.user}</td>
+                <td>${log.action}</td>
+                <td>${log.worksheet}</td>
+                <td>${log.date}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="viewPdf('${log.pdf}')">View</button>
+                    <a href="${log.pdf}" download="Worksheet.pdf" class="btn btn-secondary">Download</a>
+                </td>
+            `;
+            pdfLogBody.appendChild(logRow);
+        });
+
+        renderPaginationControls(totalPages);
+    }
+
+    function renderPaginationControls(totalPages) {
+        const paginationContainer = document.getElementById('pagination-controls');
+        paginationContainer.innerHTML = '';
+
+        if (totalPages > 1) {
+            if (currentPage > 1) {
+                paginationContainer.innerHTML += `<button class="btn btn-sm btn-outline-secondary" onclick="changePage(-1)">Prev</button>`;
+            }
+            paginationContainer.innerHTML += `<span class="mx-2">Page ${currentPage} of ${totalPages}</span>`;
+            if (currentPage < totalPages) {
+                paginationContainer.innerHTML += `<button class="btn btn-sm btn-outline-secondary" onclick="changePage(1)">Next</button>`;
+            }
+        }
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        renderPdfActivityLog();
+    }
+
+    function viewPdf(pdfBase64) {
+        // Ensure the iframe is ready to display the PDF
+        const iframe = document.getElementById('pdfIframe');
+        iframe.src = pdfBase64;
+
+        // Open the modal
+        const myModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+        myModal.show();
+    }
+
+    document.addEventListener("DOMContentLoaded", renderPdfActivityLog);
+</script>
+
+
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS and Popper (needed for modal functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+
+        
+        
+                
+        <div class="content-page" id="settings" style="display:none;">
+            <h2 class="table-heading">User Status</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>User</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" class="status-toggle" data-user-id="{{ user.id }}" {% if user.is_active %}checked{% endif %}>
+                        <span class="slider round"></span>
+                    </label>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        </div>
+
+        <script>
+           document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".status-toggle").forEach(toggle => {
+        toggle.addEventListener("change", function () {
+            const userId = this.getAttribute("data-user-id");  
+            const newStatus = this.checked;
+
+            fetch("/update_user_status", {  // ✅ Ensure this matches Flask route
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, status: newStatus })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Success:", data.message);
+            })
+            .catch(error => {
+                console.error("Error updating status:", error);
+            });
+        });
+    });
+});
+
+        </script>
+
+
+
+
+
+
+        <div class="content-page" id="reports" style="display:none;">
+            <h2>Reports Content</h2>
+            <!-- Add content here -->
+        </div>
+
+
+        <div class="content-page" id="batches" style="display:none;">
+            <h2>Batches </h2>
+            <button class="btn btn-primary mb-3" onclick="openBatchModal()">Add New Batch</button>
+            
+            <table class="table table-striped" id="batchTable">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Week</th>
+                        <th>Batch Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTableBody">
+                    <!-- Batches will be dynamically inserted here -->
+                </tbody>
+            </table>
+            
+        </div>
+        
+        <!-- Batch Modal -->
+<div id="batchModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add/Edit Batch</h5>
+                <button type="button" class="btn-close" onclick="closeBatchModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="batchId">
+                <label>Batch Name:</label>
+                <input type="text" id="batchName" class="form-control" required>
+                <label>Month:</label>
+                <input type="text" id="batchMonth" class="form-control" required>
+                <label>Week:</label>
+                <input type="text" id="batchWeek" class="form-control" required>
+                <label>Start Date:</label>
+                <input type="date" id="batchStartDate" class="form-control" required>
+                <label>End Date:</label>
+                <input type="date" id="batchEndDate" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeBatchModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBatch()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        
+<script>
+    let batches = [];
+
+    // Fetch batches from backend and sync with local storage
+    async function fetchBatches() {
+        try {
+            let response = await fetch("/get_batches");
+            let fetchedBatches = await response.json();
+            batches = fetchedBatches;
+
+            // Save to local storage for syncing
+            localStorage.setItem("syncBatches", JSON.stringify(batches));
+            
+            updateBatchTable();
+            syncWithCalendar();
+        } catch (error) {
+            console.error("Error fetching batches:", error);
+        }
+    }
+
+    // Open batch modal (for adding or editing)
+    function openBatchModal(id = "", month = "", week = "", name = "", start = "", end = "") {
+        document.getElementById("batchId").value = id;
+        document.getElementById("batchName").value = name;
+        document.getElementById("batchMonth").value = month;
+        document.getElementById("batchWeek").value = week;
+        document.getElementById("batchStartDate").value = start;
+        document.getElementById("batchEndDate").value = end;
+        document.getElementById("batchModal").style.display = "block";
+    }
+
+    function closeBatchModal() {
+        document.getElementById("batchModal").style.display = "none";
+    }
+
+    // Save batch (new or edited)
+    async function saveBatch() {
+        let id = document.getElementById("batchId").value;
+        let batchData = {
+            name: document.getElementById("batchName").value,
+            month: document.getElementById("batchMonth").value,
+            week: document.getElementById("batchWeek").value,
+            start_date: document.getElementById("batchStartDate").value,
+            end_date: document.getElementById("batchEndDate").value
+        };
+
+        let url = id ? `/edit_batch/${id}` : "/add_batch";
+        let method = id ? "PUT" : "POST";
+
+        try {
+            let response = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(batchData)
+            });
+
+            let result = await response.json();
+            alert(result.message);
+
+            // Sync local data
+            await fetchBatches();
+            closeBatchModal();
+        } catch (error) {
+            console.error("Error saving batch:", error);
+        }
+    }
+
+    // Delete batch
+    async function deleteBatch(id) {
+        if (!confirm("Are you sure you want to delete this batch?")) return;
+
+        try {
+            let response = await fetch(`/delete_batch/${id}`, { method: "DELETE" });
+            let result = await response.json();
+            alert(result.message);
+
+            // Sync local data
+            await fetchBatches();
+        } catch (error) {
+            console.error("Error deleting batch:", error);
+        }
+    }
+
+    // Update batch table dynamically
+    function updateBatchTable() {
+        const tableBody = document.querySelector("#batchTable tbody");
+        tableBody.innerHTML = "";
+
+        batches.forEach((batch, index) => {
+            const row = `<tr>
+                <td>${batch.month}</td>
+                <td>${batch.week}</td>
+                <td>${batch.name}</td>
+                <td>${batch.start_date}</td>
+                <td>${batch.end_date}</td>
+                <td>
+                    <button class='btn btn-warning btn-sm' onclick='openBatchModal("${batch.id}", "${batch.month}", "${batch.week}", "${batch.name}", "${batch.start_date}", "${batch.end_date}")'>Edit</button>
+                    <button class='btn btn-danger btn-sm' onclick='deleteBatch(${batch.id})'>Delete</button>
+                </td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    // Sync with local storage and update calendar
+    function syncWithCalendar() {
+        localStorage.setItem("syncBatches", JSON.stringify(batches));
+        console.log("Batches synced:", batches);
+    }
+
+    // Ensure changes reflect in calendar on page load
+    document.addEventListener("DOMContentLoaded", async () => {
+        let storedBatches = localStorage.getItem("syncBatches");
+        if (storedBatches) {
+            batches = JSON.parse(storedBatches);
+            updateBatchTable();
+        }
+        await fetchBatches();
+    });
+</script>
+
+
+
+
+
+
+        <div class="content-page" id="leads" style="display:none;">
+            <h2>Leads</h2>
+        
+            <!-- Top 5 Active Users -->
+            <h3>Top 5 Active Users</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Activity Count</th>
+                    </tr>
+                </thead>
+                <tbody id="top-users-body"></tbody>
+            </table>
+        
+            <!-- Activity Timeline Chart -->
+            <h3>User Activity Timeline</h3>
+            <div style="width: 100%; height: 50vh; position: relative;">
+                <canvas id="activityChart"></canvas>
+            </div>
+            <select id="activityFilter">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        
+            <!-- General Admin Settings -->
+            <h3>General Settings</h3>
+            <button onclick="saveSettings()">Save Settings</button>
+        </div>
+        
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchTopUsers();
+            fetchActivityData('daily');
+            document.getElementById('activityFilter').addEventListener('change', function () {
+                fetchActivityData(this.value);
+            });
+        });
+        
+        async function fetchTopUsers() {
+            try {
+                let response = await fetch('/get_top_users');
+                let data = await response.json();
+        
+                if (!Array.isArray(data)) {
+                    console.error("Error fetching top users:", data);
+                    return;
+                }
+        
+                let tbody = document.getElementById('top-users-body');
+                tbody.innerHTML = '';
+        
+                data.forEach(user => {
+                    let row = `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.activity_count}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Failed to fetch top users:", error);
+            }
+        }
+        
+        let activityChartInstance = null;
+        
+        async function fetchActivityData(filter) {
+            try {
+                let response = await fetch(`/get_activity_data?filter=${filter}`);
+                let data = await response.json();
+                renderChart(data);
+            } catch (error) {
+                console.error("Failed to fetch activity data:", error);
+            }
+        }
+        
+        function renderChart(data) {
+            let canvas = document.getElementById('activityChart');
+            let ctx = canvas.getContext('2d');
+        
+            if (activityChartInstance !== null) {
+                activityChartInstance.destroy();
+                activityChartInstance = null;
+            }
+        
+            canvas.style.width = "100%";
+            canvas.style.height = "auto";
+        
+            activityChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'User Activity',
+                        data: data.values,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: 'black' } },
+                        y: { ticks: { color: 'black' } }
+                    }
+                }
+            });
+        }
+        
+        function saveSettings() {
+            alert('Settings saved successfully!');
+        }
+        </script>
+        
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+        
+
+    
+
+        <script>
+          function loadContent(sectionId, event = null) {
+    const sections = document.querySelectorAll('.content-page');
+    sections.forEach(section => {
+        section.style.display = 'none';  // Hide all sections
+    });
+
+    const activeSection = document.getElementById(sectionId);
+    if (activeSection) {
+        activeSection.style.display = 'block';  // Show the selected section
+    }
+
+    // Update active link in sidebar
+    document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+
+    if (event && event.target && typeof event.target.closest === 'function') {
+        let clickedElement = event.target.closest('a'); // Ensure event.target refers to a link
+        if (clickedElement) {
+            clickedElement.classList.add('active');
+        }
+    }
+}
+
+
+            // Default content
+            document.addEventListener('DOMContentLoaded', () => {
+                loadContent('dashboard');  // Load 'dashboard' section by default
+            });
+
+            // Sorting functionality
+            document.querySelectorAll('.sort-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const sortBy = button.getAttribute('data-sort');
+                    let rows = Array.from(document.querySelectorAll('tbody tr'));
+                    rows.sort((a, b) => {
+                        let cellA = a.querySelector(`td:nth-child(${button.parentElement.cellIndex + 1})`).textContent.trim();
+                        let cellB = b.querySelector(`td:nth-child(${button.parentElement.cellIndex + 1})`).textContent.trim();
+                        if (sortBy === 'name') {
+                            return cellA.localeCompare(cellB);
+                        } else if (sortBy === 'email') {
+                            return cellA.localeCompare(cellB);
+                        }
+                        return 0;
+                    });
+                    rows.forEach(row => document.querySelector('tbody').appendChild(row));
+                });
+            });
+
+            // Show/Hide logs functionality
+            document.querySelectorAll('.log-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const logDiv = document.getElementById(`logs-${button.getAttribute('data-user')}`);
+                    logDiv.style.display = logDiv.style.display === 'none' ? 'block' : 'none';
+                });
+            });
+
+            // Toggle sidebar visibility
+            function toggleSidebar() {
+                const sidebar = document.querySelector('.sidebar');
+                const mainContent = document.querySelector('.main-content');
+                sidebar.classList.toggle('show');
+                mainContent.classList.toggle('show-sidebar');
+            }
+        </script>
+    </div>
+</body>
+</html>

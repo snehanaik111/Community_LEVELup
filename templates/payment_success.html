@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .message {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <h2>✅ Payment Successful!</h2>
+        <p>Thank you for subscribing, {{ name }}.</p>
+        <p>Transaction ID: {{ txnid }}</p>
+        <p>Plan: {{ plan }}</p>
+        <p>Amount Paid: ${{ amount }}</p>
+    </div>
+
+    <!-- Buttons -->
+    <button class="btn" onclick="downloadReceipt()">📄 Download Receipt</button>
+    <a href="{{ url_for('chatbot') }}" class="btn">➡️ Go to Dashboard</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Logout</a>
+    <a href="{{ url_for('home') }}" class="btn">🏠 Home</a>
+
+    <script>
+        function downloadReceipt() {
+            window.location.href = "{{ url_for('generate_receipt', txnid=txnid, plan=plan, amount=amount) }}";
+        }
+    </script>
+</body>
+</html>
